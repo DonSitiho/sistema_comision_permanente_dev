@@ -25,7 +25,14 @@ class UsersSeeder extends Seeder
 
         $demoUser2 = User::create([
             'name'              => $faker->name,
-            'email'             => 'admin@demo.com',
+            'email'             => 'capturista@demo.com',
+            'password'          => Hash::make('demo'),
+            'email_verified_at' => now(),
+        ]);
+
+        $demoUser2 = User::create([
+            'name'              => $faker->name,
+            'email'             => 'general@demo.com',
             'password'          => Hash::make('demo'),
             'email_verified_at' => now(),
         ]);

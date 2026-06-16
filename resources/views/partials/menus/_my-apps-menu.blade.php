@@ -5,7 +5,7 @@
 		<!--begin::Card header-->
 		<div class="card-header">
 			<!--begin::Card title-->
-			<div class="card-title">My Apps</div>
+			<div class="card-title">Busca este texto para editar el contenido de este menu Apps</div>
 			<!--end::Card title-->
 			<!--begin::Card toolbar-->
 			<div class="card-toolbar">

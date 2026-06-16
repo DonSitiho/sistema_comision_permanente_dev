@@ -36,7 +36,7 @@
 				<!--begin:Menu link-->
 				<span class="menu-link">
 					<span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
-					<span class="menu-title">Admin. QR</span>
+					<span class="menu-title">Registros</span>
 					<span class="menu-arrow"></span>
 				</span>
 				<!--end:Menu link-->
@@ -86,7 +86,7 @@
 				<!--begin:Menu link-->
 				<span class="menu-link">
 					<span class="menu-icon">{!! getIcon('abstract-28', 'fs-2') !!}</span>
-					<span class="menu-title">User Management</span>
+					<span class="menu-title">Usuarios</span>
 					<span class="menu-arrow"></span>
 				</span>
 				<!--end:Menu link-->
@@ -99,7 +99,7 @@
 							<span class="menu-bullet">
 								<span class="bullet bullet-dot"></span>
 							</span>
-							<span class="menu-title">Users</span>
+							<span class="menu-title">Admin. Usuarios</span>
 						</a>
 						<!--end:Menu link-->
 					</div>
@@ -123,7 +123,7 @@
 							<span class="menu-bullet">
 								<span class="bullet bullet-dot"></span>
 							</span>
-							<span class="menu-title">Permissions</span>
+							<span class="menu-title">Permisos</span>
 						</a>
 						<!--end:Menu link-->
 					</div>
