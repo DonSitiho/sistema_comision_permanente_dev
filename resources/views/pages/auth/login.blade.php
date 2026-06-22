@@ -55,6 +55,7 @@
         <!--begin::Input group--->
         <div class="fv-row mb-8">
             <!--begin::Email-->
+            <span class="w-125px text-gray-500 fw-semibold fs-7">Email </span>
             <input type="text" placeholder="Email" name="email" autocomplete="off" class="form-control bg-transparent" value="demo@demo.com"/>
             <!--end::Email-->
         </div>
@@ -62,6 +63,7 @@
         <!--end::Input group--->
         <div class="fv-row mb-3">
             <!--begin::Password-->
+            <span class="w-125px text-gray-500 fw-semibold fs-7">Password</span>
             <input type="password" placeholder="Password" name="password" autocomplete="off" class="form-control bg-transparent" value="demo"/>
             <!--end::Password-->
         </div>
