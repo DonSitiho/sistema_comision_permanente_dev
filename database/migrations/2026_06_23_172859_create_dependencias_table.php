@@ -1,0 +1,36 @@
+<?php
+// database/migrations/xxxx_xx_xx_create_dependencias_table.php
+ 
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+ 
+return new class extends Migration
+{
+    public function up(): void
+    {
+        Schema::create('dependencias', function (Blueprint $table) {
+            $table->id();
+            $table->string('nombre', 200);
+            $table->string('clave', 50)->nullable()->unique();
+ 
+            // Solo 3 tipos válidos en el sistema SCPC
+            $table->enum('tipo', ['estatal', 'municipal', 'oic'])
+                  ->default('estatal');
+ 
+            // Nullable: puede existir una dependencia sin región asignada aún
+            $table->foreignId('region_id')
+                  ->nullable()
+                  ->constrained('regiones')
+                  ->nullOnDelete();
+ 
+            $table->boolean('activo')->default(true);
+            $table->timestamps();
+        });
+    }
+ 
+    public function down(): void
+    {
+        Schema::dropIfExists('dependencias');
+    }
+};
