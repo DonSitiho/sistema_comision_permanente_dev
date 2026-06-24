@@ -1,144 +1,142 @@
 <?php
-
+// app/Livewire/User/AddUserModal.php
+ 
 namespace App\Livewire\User;
-
+ 
+use App\Models\Dependencia;
 use App\Models\User;
+use App\Services\AuditService;
 use Livewire\Component;
 use Livewire\WithFileUploads;
 use Illuminate\Support\Facades\DB;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
-
+use Spatie\Permission\Models\Role;
+ 
 class AddUserModal extends Component
 {
     use WithFileUploads;
-
-    public $user_id;
-    public $name;
-    public $email;
-    public $role;
-    public $avatar;
-    public $saved_avatar;
-
-    public $edit_mode = false;
-
-    protected $rules = [
-        'name' => 'required|string',
-        'email' => 'required|email',
-        'role' => 'required|string',
-        'avatar' => 'nullable|sometimes|image|max:1024',
-    ];
-
+ 
+    // Propiedades del formulario
+    public ?int    $user_id      = null;
+    public string  $name         = '';
+    public string  $email        = '';
+    public string  $cargo        = '';
+    public ?int    $dependencia_id = null;
+    public string  $role         = '';
+    public         $avatar       = null;
+    public ?string $saved_avatar = null;
+    public bool    $edit_mode    = false;
+ 
+    // rules() como método para poder usar $this->user_id dinámicamente
+    protected function rules(): array
+    {
+        return [
+            'name'           => 'required|string|max:200',
+            // unique ignora el propio registro en edición
+            'email'          => 'required|email|unique:users,email,' . ($this->user_id ?? 'NULL'),
+            'cargo'          => 'nullable|string|max:150',
+            'dependencia_id'  => 'nullable|exists:dependencias,id',
+            'role'           => 'required|string',
+            'avatar'         => 'nullable|sometimes|image|max:2048',
+        ];
+    }
+ 
     protected $listeners = [
         'delete_user' => 'deleteUser',
         'update_user' => 'updateUser',
-        'new_user' => 'hydrate',
+        'new_user'    => 'hydrate',
     ];
-
+ 
     public function render()
     {
-        $roles = Role::all();
-
-        $roles_description = [
-            'administrator' => 'Best for business owners and company administrators',
-            'developer' => 'Best for developers or people primarily using the API',
-            'analyst' => 'Best for people who need full access to analytics data, but don\'t need to update business settings',
-            'support' => 'Best for employees who regularly refund payments and respond to disputes',
-            'trial' => 'Best for people who need to preview content data, but don\'t need to make any updates',
-        ];
-
-        foreach ($roles as $i => $role) {
-            $roles[$i]->description = $roles_description[$role->name] ?? '';
-        }
-
-        return view('livewire.user.add-user-modal', compact('roles'));
+        return view('livewire.user.add-user-modal', [
+            'roles'        => Role::orderBy('name')->get(),
+            // Solo dependencias activas para el select
+            'dependencias' => Dependencia::activas()->orderBy('nombre')->get(),
+        ]);
     }
-
-    public function submit()
+ 
+    public function submit(): void
     {
-        // Validate the form input data
         $this->validate();
-
+ 
         DB::transaction(function () {
-            // Prepare the data for creating a new user
             $data = [
-                'name' => $this->name,
+                'name'          => $this->name,
+                'email'         => $this->email,
+                'cargo'         => $this->cargo ?: null,
+                'dependencia_id' => $this->dependencia_id,
             ];
-
+ 
             if ($this->avatar) {
                 $data['profile_photo_path'] = $this->avatar->store('avatars', 'public');
-            } else {
-                $data['profile_photo_path'] = null;
             }
-
-            if (!$this->edit_mode) {
-                $data['password'] = Hash::make($this->email);
-            }
-
-            // Update or Create a new user record in the database
-            $data['email'] = $this->email;
-            $user = User::find($this->user_id) ?? User::create($data);
-
+ 
             if ($this->edit_mode) {
-                foreach ($data as $k => $v) {
-                    $user->$k = $v;
-                }
-                $user->save();
-            }
-
-            if ($this->edit_mode) {
-                // Assign selected role for user
+                $user = User::findOrFail($this->user_id);
+                $user->update($data);
                 $user->syncRoles($this->role);
-
-                // Emit a success event with a message
-                $this->dispatch('success', __('User updated'));
+                // AuditService no se llama aquí: el UserObserver lo hace automáticamente
+                $this->dispatch('success', __('Usuario actualizado correctamente.'));
+ 
             } else {
-                // Assign selected role for user
+                // Contraseña temporal = email hasheado.
+                // El usuario la cambia con el link de activación.
+                $data['password'] = Hash::make($this->email);
+                $user = User::create($data);
                 $user->assignRole($this->role);
-
-                // Send a password reset link to the user's email
+ 
+                // Enviar correo para que el usuario establezca su contraseña real
                 Password::sendResetLink($user->only('email'));
-
-                // Emit a success event with a message
-                $this->dispatch('success', __('New user created'));
+ 
+                $this->dispatch('success', __('Usuario creado. Se envió correo de activación.'));
             }
         });
-
-        // Reset the form fields after successful submission
+ 
         $this->reset();
     }
-
-    public function deleteUser($id)
+ 
+    public function deleteUser(int $id): void
     {
-        // Prevent deletion of current user
-        if ($id == Auth::id()) {
-            $this->dispatch('error', 'User cannot be deleted');
+        if ($id === Auth::id()) {
+            $this->dispatch('error', 'No puedes desactivar tu propio usuario.');
             return;
         }
-
-        // Delete the user record with the specified ID
-        User::destroy($id);
-
-        // Emit a success event with a message
-        $this->dispatch('success', 'User successfully deleted');
+ 
+        $user = User::findOrFail($id);
+ 
+        // Desactivar en lugar de eliminar (preserva historial y bitácora)
+        $user->update(['is_active' => false]);
+        $user->syncRoles([]);
+ 
+        // Auditoría manual porque desactivar no es un "deleted" de Eloquent
+        AuditService::log('deactivated', 'users', $id, [
+            'name'  => $user->name,
+            'email' => $user->email,
+        ]);
+ 
+        $this->dispatch('success', 'Usuario desactivado correctamente.');
     }
-
-    public function updateUser($id)
+ 
+    public function updateUser(int $id): void
     {
         $this->edit_mode = true;
-
-        $user = User::find($id);
-
-        $this->user_id = $user->id;
-        $this->saved_avatar = $user->profile_photo_url;
-        $this->name = $user->name;
-        $this->email = $user->email;
-        $this->role = $user->roles?->first()->name ?? '';
+        $user = User::with('roles', 'dependencia')->findOrFail($id);
+ 
+        $this->fill([
+            'user_id'        => $user->id,
+            'saved_avatar'   => $user->profile_photo_url,
+            'name'           => $user->name,
+            'email'          => $user->email,
+            'cargo'          => $user->cargo ?? '',
+            'dependencia_id'  => $user->dependencia_id,
+            'role'           => $user->roles->first()?->name ?? '',
+        ]);
     }
-
-    public function hydrate()
+ 
+    public function hydrate(): void
     {
         $this->resetErrorBag();
         $this->resetValidation();

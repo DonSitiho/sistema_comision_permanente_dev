@@ -1,5 +1,5 @@
 <?php
-// bootstrap/app.php
+// bootstrap/app.php — versión completa con listeners y middlewares
  
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -12,25 +12,32 @@ return Application::configure(basePath: dirname(__DIR__))
         health: '/up',
     )
     ->withMiddleware(function (Middleware $middleware) {
- 
-        // Aplicar throttle:login a las rutas de autenticación.
-        // "login" referencia el RateLimiter definido en AppServiceProvider.
-       //$middleware->throttleWithRedis();
- 
-        $middleware->group('web', [
-            // Los middlewares web de Laravel ya están aquí por defecto.
-            // Solo agregamos el alias para usarlo en rutas.
+        // Alias para middlewares de Spatie Permission
+        $middleware->alias([
+            'permission'        => \Spatie\LaravelPermission\Middleware\PermissionMiddleware::class,
+            'role'              => \Spatie\LaravelPermission\Middleware\RoleMiddleware::class,
+            'role_or_permission'=> \Spatie\LaravelPermission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
- 
-         // Alias para usar en rutas: ->middleware("throttle:login")
-    $middleware->alias([
-        'permission'         => \Spatie\LaravelPermission\Middleware\PermissionMiddleware::class,
-        'role'               => \Spatie\LaravelPermission\Middleware\RoleMiddleware::class,
-        'role_or_permission' => \Spatie\LaravelPermission\Middleware\RoleOrPermissionMiddleware::class,
-    ]);
     })
+    ->withEvents()
+   /* ->withEvents(function ($events) {
+        // Mapeo explícito: evento → listener(s)
+        // Cada evento puede tener múltiples listeners en el array.
+        $events->listen(
+            \Illuminate\Auth\Events\Login::class,
+            \App\Listeners\LogSuccessfulLogin::class
+        );
+        $events->listen(
+            \Illuminate\Auth\Events\Failed::class,
+            \App\Listeners\LogFailedLogin::class
+        );
+        $events->listen(
+            \Illuminate\Auth\Events\Logout::class,
+            \App\Listeners\LogLogout::class
+        );
+    })*/
     ->withExceptions(function (Exceptions $exceptions) {
-        // Personalizar respuesta 403 del sistema
+        // Respuesta 403 personalizada para permisos de Spatie
         $exceptions->render(function (\Spatie\LaravelPermission\Exceptions\UnauthorizedException $e) {
             return response()->view('errors.403', [], 403);
         });

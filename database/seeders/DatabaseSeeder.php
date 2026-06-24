@@ -16,14 +16,15 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call([
+        $this->call(ScpcSeeder::class);
+        /*$this->call([
             UsersSeeder::class,
             RolesPermissionsSeeder::class,
-        ]);
+        ]);*/
 
         //\App\Models\User::factory(20)->create();
 
-        Address::factory(3)->create();
+        //Address::factory(3)->create();
 
         // \App\Models\User::factory()->create([
         //     'name' => 'Test User',

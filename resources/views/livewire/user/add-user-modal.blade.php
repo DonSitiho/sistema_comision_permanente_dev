@@ -1,161 +1,108 @@
-<div class="modal fade" id="kt_modal_add_user" tabindex="-1" aria-hidden="true" wire:ignore.self>
-    <!--begin::Modal dialog-->
-    <div class="modal-dialog modal-dialog-centered mw-650px">
-        <!--begin::Modal content-->
-        <div class="modal-content">
-            <!--begin::Modal header-->
-            <div class="modal-header" id="kt_modal_add_user_header">
-                <!--begin::Modal title-->
-                <h2 class="fw-bold">Add User</h2>
-                <!--end::Modal title-->
-                <!--begin::Close-->
-                <div class="btn btn-icon btn-sm btn-active-icon-primary" data-bs-dismiss="modal" aria-label="Close">
-                    {!! getIcon('cross','fs-1') !!}
+{{-- resources/views/livewire/user/add-user-modal.blade.php --}}
+<div>
+    <div class="modal fade" id="kt_modal_add_user" tabindex="-1" wire:ignore.self>
+        <div class="modal-dialog modal-dialog-centered mw-650px">
+            <div class="modal-content">
+ 
+                <div class="modal-header">
+                    <h2 class="fw-bold">
+                        {{ $edit_mode ? "Editar Usuario" : "Nuevo Usuario" }}
+                    </h2>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <!--end::Close-->
-            </div>
-            <!--end::Modal header-->
-            <!--begin::Modal body-->
-            <div class="modal-body px-5 my-7">
-                <!--begin::Form-->
-                <form id="kt_modal_add_user_form" class="form" action="#" wire:submit="submit" enctype="multipart/form-data">
-                    <input type="hidden" wire:model="user_id" name="user_id" value="{{ $user_id }}"/>
-                    <!--begin::Scroll-->
-                    <div class="d-flex flex-column scroll-y px-5 px-lg-10" id="kt_modal_add_user_scroll" data-kt-scroll="true" data-kt-scroll-activate="true" data-kt-scroll-max-height="auto" data-kt-scroll-dependencies="#kt_modal_add_user_header" data-kt-scroll-wrappers="#kt_modal_add_user_scroll" data-kt-scroll-offset="300px">
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-7">
-                            <!--begin::Label-->
-                            <label class="d-block fw-semibold fs-6 mb-5">Avatar</label>
-                            <!--end::Label-->
-                            <!--begin::Image placeholder-->
-                            <style>
-                                .image-input-placeholder {
-                                    background-image: url('{{ image('svg/files/blank-image.svg') }}');
-                                }
-
-                                [data-bs-theme="dark"] .image-input-placeholder {
-                                    background-image: url('{{ image('svg/files/blank-image-dark.svg') }}');
-                                }
-                            </style>
-                            <!--end::Image placeholder-->
-                            <!--begin::Image input-->
-                            <div class="image-input image-input-outline image-input-placeholder {{ $avatar || $saved_avatar ? '' : 'image-input-empty' }}" data-kt-image-input="true">
-                                <!--begin::Preview existing avatar-->
-                                @if($avatar)
-                                    <div class="image-input-wrapper w-125px h-125px" style="background-image: url({{ $avatar ? $avatar->temporaryUrl() : '' }});"></div>
-                                @else
-                                    <div class="image-input-wrapper w-125px h-125px" style="background-image: url({{ $saved_avatar }});"></div>
-                                @endif
-                                <!--end::Preview existing avatar-->
-                                <!--begin::Label-->
-                                <label class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="change" data-bs-toggle="tooltip" title="Change avatar">
-                                    {!! getIcon('pencil','fs-7') !!}
-                                    <!--begin::Inputs-->
-                                    <input type="file" wire:model="avatar" name="avatar" accept=".png, .jpg, .jpeg"/>
-                                    <input type="hidden" name="avatar_remove"/>
-                                    <!--end::Inputs-->
-                                </label>
-                                <!--end::Label-->
-                                <!--begin::Cancel-->
-                                <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="cancel" data-bs-toggle="tooltip" title="Cancel avatar">
-                                    {!! getIcon('cross','fs-2') !!}
-                                </span>
-                                <!--end::Cancel-->
-                                <!--begin::Remove-->
-                                <span class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow" data-kt-image-input-action="remove" data-bs-toggle="tooltip" title="Remove avatar">
-                                    {!! getIcon('cross','fs-2') !!}
-                                </span>
-                                <!--end::Remove-->
-                            </div>
-                            <!--end::Image input-->
-                            <!--begin::Hint-->
-                            <div class="form-text">Allowed file types: png, jpg, jpeg.</div>
-                            <!--end::Hint-->
-                            @error('avatar')
-                            <span class="text-danger">{{ $message }}</span> @enderror
+ 
+                <div class="modal-body px-5 py-5">
+                    <form wire:submit="submit">
+ 
+                        {{-- Avatar --}}
+                        <div class="d-flex flex-column align-items-center mb-7">
+                            @if ($saved_avatar && !$avatar)
+                                <img src="{{ $saved_avatar }}" class="rounded-circle mb-3"
+                                     style="width:80px;height:80px;object-fit:cover;">
+                            @elseif ($avatar)
+                                <img src="{{ $avatar->temporaryUrl() }}" class="rounded-circle mb-3"
+                                     style="width:80px;height:80px;object-fit:cover;">
+                            @endif
+                            <input type="file" wire:model="avatar" class="form-control form-control-sm w-auto">
+                            @error("avatar")<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
-                        <!--end::Input group-->
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-7">
-                            <!--begin::Label-->
-                            <label class="required fw-semibold fs-6 mb-2">Full Name</label>
-                            <!--end::Label-->
-                            <!--begin::Input-->
-                            <input type="text" wire:model="name" name="name" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="Full name"/>
-                            <!--end::Input-->
-                            @error('name')
-                            <span class="text-danger">{{ $message }}</span> @enderror
+ 
+                        {{-- Nombre --}}
+                        <div class="mb-5">
+                            <label class="form-label required">Nombre completo</label>
+                            <input wire:model="name" type="text" class="form-control"
+                                   placeholder="Nombre del servidor público">
+                            @error("name")<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
-                        <!--end::Input group-->
-                        <!--begin::Input group-->
-                        <div class="fv-row mb-7">
-                            <!--begin::Label-->
-                            <label class="required fw-semibold fs-6 mb-2">Email</label>
-                            <!--end::Label-->
-                            <!--begin::Input-->
-                            <input type="email" wire:model="email" name="email" class="form-control form-control-solid mb-3 mb-lg-0" placeholder="example@domain.com"/>
-                            <!--end::Input-->
-                            @error('email')
-                            <span class="text-danger">{{ $message }}</span> @enderror
+ 
+                        {{-- Email --}}
+                        <div class="mb-5">
+                            <label class="form-label required">Correo institucional</label>
+                            <input wire:model="email" type="email" class="form-control"
+                                   placeholder="usuario@dependencia.gob.mx">
+                            @error("email")<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
-                        <!--end::Input group-->
-                        <!--begin::Input group-->
-                        <div class="mb-7">
-                            <!--begin::Label-->
-                            <label class="required fw-semibold fs-6 mb-5">Role</label>
-                            <!--end::Label-->
-                            @error('role')
-                            <span class="text-danger">{{ $message }}</span> @enderror
-                            <!--begin::Roles-->
-                            @foreach($roles as $role)
-                                <!--begin::Input row-->
-                                <div class="d-flex fv-row">
-                                    <!--begin::Radio-->
-                                    <div class="form-check form-check-custom form-check-solid">
-                                        <!--begin::Input-->
-                                        <input class="form-check-input me-3" id="kt_modal_update_role_option_{{ $role->id }}" wire:model="role" name="role" type="radio" value="{{ $role->name }}" checked="checked"/>
-                                        <!--end::Input-->
-                                        <!--begin::Label-->
-                                        <label class="form-check-label" for="kt_modal_update_role_option_{{ $role->id }}">
-                                            <div class="fw-bold text-gray-800">
-                                                {{ ucwords($role->name) }}
-                                            </div>
-                                            <div class="text-gray-600">
-                                                {{ $role->description }}
-                                            </div>
-                                        </label>
-                                        <!--end::Label-->
-                                    </div>
-                                    <!--end::Radio-->
-                                </div>
-                                <!--end::Input row-->
-                                @if(!$loop->last)
-                                    <div class='separator separator-dashed my-5'></div>
-                                @endif
-                            @endforeach
-                            <!--end::Roles-->
+ 
+                        {{-- Cargo --}}
+                        <div class="mb-5">
+                            <label class="form-label">Cargo</label>
+                            <input wire:model="cargo" type="text" class="form-control"
+                                   placeholder="Contralor Municipal, Enlace, etc.">
+                            @error("cargo")<span class="text-danger small">{{ $message }}</span>@enderror
                         </div>
-                        <!--end::Input group-->
-                    </div>
-                    <!--end::Scroll-->
-                    <!--begin::Actions-->
-                    <div class="text-center pt-15">
-                        <button type="reset" class="btn btn-light me-3" data-bs-dismiss="modal" aria-label="Close" wire:loading.attr="disabled">Discard</button>
-                        <button type="submit" class="btn btn-primary" data-kt-users-modal-action="submit">
-                            <span class="indicator-label" wire:loading.remove>Submit</span>
-                            <span class="indicator-progress" wire:loading wire:target="submit">
-                                Please wait...
-                                <span class="spinner-border spinner-border-sm align-middle ms-2"></span>
+ 
+                        {{-- Dependencia --}}
+                        <div class="mb-5">
+                            <label class="form-label">Dependencia</label>
+                            <select wire:model="dependencia_id" class="form-select">
+                                <option value="">— Sin dependencia asignada —</option>
+                                @foreach ($dependencias as $dep)
+                                    <option value="{{ $dep->id }}">
+                                        {{ $dep->nombre }}
+                                        @if($dep->tipo !== "estatal") ({{ $dep->tipo_label }}) @endif
+                                    </option>
+                                @endforeach
+                            </select>
+                            @error("dependencia_id")<span class="text-danger small">{{ $message }}</span>@enderror
+                        </div>
+ 
+                        {{-- Rol --}}
+                        <div class="mb-5">
+                            <label class="form-label required">Rol del sistema</label>
+                            <select wire:model="role" class="form-select">
+                                <option value="">— Seleccionar rol —</option>
+                                @foreach ($roles as $r)
+                                    <option value="{{ $r->name }}">{{ $r->name }}</option>
+                                @endforeach
+                            </select>
+                            @error("role")<span class="text-danger small">{{ $message }}</span>@enderror
+                        </div>
+ 
+                        @if (!$edit_mode)
+                        <div class="alert alert-info d-flex align-items-center p-3 mb-3">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <span class="small">
+                                El usuario recibirá un correo para establecer su contraseña.
                             </span>
-                        </button>
-                    </div>
-                    <!--end::Actions-->
-                </form>
-                <!--end::Form-->
+                        </div>
+                        @endif
+ 
+                        <div class="d-flex justify-content-end gap-3 pt-3">
+                            <button type="button" class="btn btn-light"
+                                    data-bs-dismiss="modal">Cancelar</button>
+                            <button type="submit" class="btn btn-primary">
+                                <span wire:loading.remove>
+                                    {{ $edit_mode ? "Guardar cambios" : "Crear usuario" }}
+                                </span>
+                                <span wire:loading>
+                                    <span class="spinner-border spinner-border-sm me-1"></span>
+                                    Procesando...
+                                </span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <!--end::Modal body-->
         </div>
-        <!--end::Modal content-->
     </div>
-    <!--end::Modal dialog-->
 </div>
