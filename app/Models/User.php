@@ -76,4 +76,14 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return ! is_null($this->two_factor_confirmed_at);
     }
+    
+    public function notificaciones()
+    {
+        return $this->hasMany(Notificacion::class)->latest();
+    }
+
+    public function notificacionesNoLeidas()
+    {
+        return $this->notificaciones()->noLeidas();
+    }
 }

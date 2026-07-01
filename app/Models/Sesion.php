@@ -1,0 +1,63 @@
+<?php
+// app/Models/Sesion.php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
+use app\services\AuditService;
+
+class Sesion extends Model
+{
+    protected $table = "f1ses_sesiones"; 
+  
+    protected $fillable = [ 
+        "convocatoria_id", "tipo", "estado", 
+        "enlace_videoconf", "plataforma", "creada_por", 
+    ]; 
+  
+    protected $casts = [ 
+        "videoconf_metadata"      => "array", 
+        "videoconf_sincronizado"  => "boolean", 
+    ]; 
+  
+    public function convocatoria() { return $this->belongsTo(Convocatoria::class); } 
+    public function creador()      { return $this->belongsTo(User::class, "creada_por"); } 
+    public function asistentes()   { return $this->hasMany(Asistente::class); } 
+    public function notas()        { return $this->hasMany(Nota::class); } 
+    public function acuerdos()     { return $this->hasMany(Acuerdo::class); } 
+  
+    private const TRANSICIONES = [ 
+        "convocada" => ["en_curso", "cancelada"], 
+        "en_curso"  => ["realizada", "cancelada"], 
+        "realizada" => [], 
+        "cancelada" => [], 
+    ]; 
+  
+    public function puedeTransicionarA(string $nuevoEstado): bool 
+    { 
+        return in_array($nuevoEstado, self::TRANSICIONES[$this->estado] ?? []); 
+    } 
+  
+    public function transicionarA(string $nuevoEstado): void 
+    { 
+        if (!$this->puedeTransicionarA($nuevoEstado)) { 
+            throw new \\DomainException( 
+                "No se puede pasar de {$this->estado} a {$nuevoEstado}." 
+            ); 
+        } 
+  
+        $estadoAnterior = $this->estado; 
+        $this->update(["estado" => $nuevoEstado]); 
+  
+        AuditService::log("cambio_estado", "f1ses_sesiones", $this->id, [ 
+            "de" => $estadoAnterior, 
+            "a"  => $nuevoEstado, 
+        ]); 
+    } 
+  
+    public function requiereVideoconferencia(): bool 
+    { 
+        return in_array($this->tipo, ["virtual", "mixta"]); 
+    } 
+}
