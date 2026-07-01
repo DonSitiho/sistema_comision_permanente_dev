@@ -1,13 +1,13 @@
 <?php 
 // app/Livewire/Sesiones/ConvocatoriaModal.php 
   
-namespace App\\Livewire\\Sesiones; 
+namespace App\Livewire\Sesiones; 
   
-use App\\Models\\Convocatoria; 
-use App\\Services\\FolioService; 
-use Illuminate\\Support\\Facades\\Auth; 
-use Illuminate\\Support\\Facades\\Gate; 
-use Livewire\\Component; 
+use App\Models\Convocatoria; 
+use App\Services\FolioService; 
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Gate; 
+use Livewire\Component; 
   
 class ConvocatoriaModal extends Component 
 { 

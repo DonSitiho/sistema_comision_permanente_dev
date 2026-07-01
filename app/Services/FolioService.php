@@ -1,10 +1,10 @@
 <?php 
 // app/Services/FolioService.php 
   
-namespace App\\Services; 
+namespace App\Services; 
   
-use App\\Models\\Convocatoria; 
-use Illuminate\\Support\\Facades\\DB; 
+use App\Models\Convocatoria; 
+use Illuminate\Support\Facades\DB; 
   
 class FolioService 
 { 

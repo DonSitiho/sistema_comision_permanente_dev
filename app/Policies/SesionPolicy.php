@@ -1,10 +1,10 @@
 <?php 
 // app/Policies/SesionPolicy.php 
   
-namespace App\\Policies; 
+namespace App\Policies; 
   
-use App\\Models\\Sesion; 
-use App\\Models\\User; 
+use App\Models\Sesion; 
+use App\Models\User; 
   
 class SesionPolicy 
 { 

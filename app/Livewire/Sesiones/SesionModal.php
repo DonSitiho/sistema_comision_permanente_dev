@@ -1,12 +1,12 @@
 <?php
 // app/Livewire/Sesiones/SesionModal.php 
   
-namespace App\\Livewire\\Sesiones; 
+namespace App\Livewire\Sesiones; 
   
-use App\\Models\\Sesion; 
-use Illuminate\\Support\\Facades\\Auth; 
-use Illuminate\\Support\\Facades\\Gate; 
-use Livewire\\Component; 
+use App\Models\Sesion; 
+use Illuminate\Support\Facades\Auth; 
+use Illuminate\Support\Facades\Gate; 
+use Livewire\Component; 
   
 class SesionModal extends Component 
 { 

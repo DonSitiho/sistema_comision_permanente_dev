@@ -1,13 +1,13 @@
 <?php
 // app/Services/IcsGeneratorService.php
-namespace App\\Services;
+namespace App\Services;
 class IcsGeneratorService
 {
     public static function generar(
         string $titulo,
         string $descripcion,
-        \\DateTimeInterface $inicio,
-        ?\\DateTimeInterface $fin = null,
+        \DateTimeInterface $inicio,
+        ?\DateTimeInterface $fin = null,
         ?string $lugar = null
         ): string {
         
@@ -19,9 +19,9 @@ class IcsGeneratorService
             "PRODID:-//SCPC//Michoacan//ES",
             "BEGIN:VEVENT",
             "UID:{$uid}",
-            "DTSTAMP:" . gmdate("Ymd\\THis\\Z"),
-            "DTSTART:" . $inicio->format("Ymd\\THis"),
-            "DTEND:" . $fin->format("Ymd\\THis"),
+            "DTSTAMP:" . gmdate("Ymd\THis\Z"),
+            "DTSTART:" . $inicio->format("Ymd\THis"),
+            "DTEND:" . $fin->format("Ymd\THis"),
             "SUMMARY:" . self::escapar($titulo),
             "DESCRIPTION:" . self::escapar($descripcion),
         ];
