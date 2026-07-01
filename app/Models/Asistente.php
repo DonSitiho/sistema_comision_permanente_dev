@@ -19,7 +19,7 @@ class Asistente extends Model
     } 
 } 
 // app/Models/Nota.php 
-namespace App\\Models; 
+namespace App\Models; 
 class Nota extends Model 
 { 
     protected $table = "f1ses_notas"; 

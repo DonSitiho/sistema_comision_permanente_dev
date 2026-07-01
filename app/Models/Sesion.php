@@ -42,7 +42,7 @@ class Sesion extends Model
     public function transicionarA(string $nuevoEstado): void 
     { 
         if (!$this->puedeTransicionarA($nuevoEstado)) { 
-            throw new \\DomainException( 
+            throw new \DomainException( 
                 "No se puede pasar de {$this->estado} a {$nuevoEstado}." 
             ); 
         } 

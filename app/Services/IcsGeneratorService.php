@@ -31,7 +31,7 @@ class IcsGeneratorService
         
         $lines[] = "END:VEVENT";
         $lines[] = "END:VCALENDAR";
-        return implode("\\r\\n", $lines);
+        return implode("\r\n", $lines);
     }
     private static function escapar(string $texto): string
     {
