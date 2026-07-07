@@ -7,6 +7,7 @@ use App\Http\Controllers\Auth\SocialiteController;
 use App\Http\Controllers\DashboardController;
 use App\Livewire\Bitacora\BitacoraIndex;  // ← agregar
 use Illuminate\Support\Facades\Route;
+use App\Livewire\Sesiones\SesionModal;
 
 Route::middleware(['auth', 'verified'])->group(function () {
 
@@ -23,6 +24,16 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::middleware(['permission:ver bitacora'])
         ->get('/admin/bitacora', BitacoraIndex::class)
         ->name('admin.bitacora');
+
+    //Crear Convocatoria
+    Route::get('/convocatorias', function () {
+        return view('pages.crearConvocatoria');})
+        ->middleware(['auth'])->name('crear-convocatoria'); 
+        
+    //Mis Convocatorias
+    Route::get('/mis-convocatorias', function () {
+        return view('pages.misConvocatorias');})
+        ->middleware(['auth'])->name('mis-convocatorias');
 
 });
 

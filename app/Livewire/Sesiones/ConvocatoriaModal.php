@@ -21,26 +21,26 @@ class ConvocatoriaModal extends Component
         return [ 
             "titulo"       => "required|string|max:200", 
             "descripcion"  => "nullable|string", 
-            "fecha_sesion" => "required|date|after:now", 
+            "fecha_sesion" => "required|date|after_or_equal:" . now()->subMinute()->toDateTimeString(),
             "lugar"        => "nullable|string|max:255", 
         ]; 
     } 
   
     public function submit(): void 
     { 
-        Gate::authorize("create", Convocatoria::class); 
-        $this->validate(); 
+        //Gate::authorize("create", Convocatoria::class); 
+        $this->validate();
   
         $convocatoria = Convocatoria::create([ 
             "folio"        => FolioService::generarConvocatoria(), 
-            "creada_por"   => Auth::id(), 
+            "creada_por"   => Auth::id() ?? 1,
+            //"creada_por"   => Auth::id(),
             "titulo"       => $this->titulo, 
             "descripcion"  => $this->descripcion, 
             "fecha_sesion" => $this->fecha_sesion, 
             "lugar"        => $this->lugar, 
             "estado"       => "borrador", 
         ]); 
-  
         $this->dispatch("success", "Convocatoria {$convocatoria->folio} creada."); 
         $this->dispatch("convocatoria-creada", id: $convocatoria->id); 
         $this->reset(); 
@@ -48,6 +48,15 @@ class ConvocatoriaModal extends Component
   
     public function render() 
     { 
-        return view("livewire.sesiones.convocatoria-modal"); 
+        $convocatorias = Convocatoria::orderBy('created_at', 'desc')->get();
+        return view("livewire.sesiones.convocatoria-modal", [
+            'convocatorias' => $convocatorias
+        ]);
+
+        //return view("livewire.sesiones.convocatoria-modal"); 
     } 
-} 
+    public function seleccionarConvocatoria(int $id): void
+    {
+        $this->dispatch("convocatoria-creada", id: $id); 
+    }
+}

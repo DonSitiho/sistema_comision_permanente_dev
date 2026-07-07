@@ -1,24 +1,28 @@
 <?php
-// app/Livewire/Sesiones/SesionModal.php 
-  
+// app/Livewire/Sesiones/SesionModal.php
 namespace App\Livewire\Sesiones; 
   
 use App\Models\Sesion; 
+use App\Models\Convocatoria; 
 use Illuminate\Support\Facades\Auth; 
 use Illuminate\Support\Facades\Gate; 
+use Illuminate\Support\Facades\DB;
 use Livewire\Component; 
+use Livewire\Attributes\On; 
   
 class SesionModal extends Component 
 { 
     public ?int $convocatoria_id = null; 
+    public ?Convocatoria $convocatoriaReciente = null;
     public string $tipo             = "presencial"; 
     public string $enlace_videoconf = ""; 
     public string $plataforma       = ""; 
-  
-    public function getRequiereVideoconfProperty(): bool 
+    public bool $esLectura = false;
+
+    public function requiereVideoconf(): bool 
     { 
         return in_array($this->tipo, ["virtual", "mixta"]); 
-    } 
+    }
   
     protected function rules(): array 
     { 
@@ -28,57 +32,55 @@ class SesionModal extends Component
             "plataforma"       => "required_if:tipo,virtual,mixta|nullable|in:zoom,meet,webex,teams,otro", 
         ]; 
     } 
-  
+
+    #[On('convocatoria-creada')]
+    public function asignarConvocatoria(int $id): void
+    {
+        $this->convocatoria_id = $id;
+        $this->convocatoriaReciente = Convocatoria::find($id);
+
+        $sesionExistente = Sesion::where('convocatoria_id', $id)->first();
+        if ($sesionExistente) {
+            $this->tipo = $sesionExistente->tipo;
+            $this->enlace_videoconf = $sesionExistente->enlace_videoconf ?? '';
+            $this->plataforma = $sesionExistente->plataforma ?? '';
+            $this->esLectura = true;
+        } else {
+            $this->reset(['tipo', 'enlace_videoconf', 'plataforma']);
+            $this->esLectura = false;
+        }
+    }
+
     public function submit(): void 
     { 
         Gate::authorize("create", Sesion::class); 
         $this->validate(); 
   
-        Sesion::create([ 
-            "convocatoria_id"  => $this->convocatoria_id, 
-            "tipo"             => $this->tipo, 
-            "estado"           => "convocada", 
-            "enlace_videoconf" => $this->requiereVideoconf ? $this->enlace_videoconf : null, 
-            "plataforma"       => $this->requiereVideoconf ? $this->plataforma : null, 
-            "creada_por"       => Auth::id(), 
-        ]); 
-  
-        $this->dispatch("success", "Sesion registrada."); 
-        $this->reset(); 
+        DB::transaction(function () {
+            //Crea la sesión vinculando el convocatoria_id heredado de la fila
+            Sesion::create([ 
+                "convocatoria_id"  => $this->convocatoria_id, 
+                "tipo"             => $this->tipo, 
+                "estado"           => "convocada", 
+                "enlace_videoconf" => $this->requiereVideoconf() ? $this->enlace_videoconf : null, 
+                "plataforma"       => $this->requiereVideoconf() ? $this->plataforma : null, 
+                "creada_por"       => Auth::id() ?? 1, 
+            ]); 
+      
+            //Cambia el estado de la Convocatoria a 'enviada' una vez que se ha creado la sesión
+            Convocatoria::where('id', $this->convocatoria_id)->update([
+                'estado' => 'enviada'
+            ]);
+        });
+
+        $this->dispatch("success", "Sesión registrada y convocatoria actualizada."); 
+        $this->dispatch('refreshTable')->to(\App\Livewire\Sesiones\ConvocatoriaListado::class); 
+
+        $this->reset(['tipo', 'enlace_videoconf', 'plataforma', 'convocatoria_id']); 
     } 
   
     public function render() 
     { 
         return view("livewire.sesiones.sesion-modal"); 
     } 
-    <select wire:model.live="tipo" class="form-select mb-4"> 
-        <option value="presencial">Presencial</option> 
-        <option value="virtual">Virtual</option> 
-        <option value="mixta">Mixta</option> 
-    </select> 
-  
-    @if ($this->requiereVideoconf) 
-        <div class="mb-4"> 
-            <label class="form-label">Plataforma</label> 
-            <select wire:model="plataforma" class="form-select"> 
-                <option value="">Seleccionar...</option> 
-                <option value="zoom">Zoom</option> 
-                <option value="meet">Google Meet</option> 
-                <option value="webex">Webex</option> 
-                <option value="teams">Microsoft Teams</option> 
-                <option value="otro">Otro</option> 
-            </select> 
-        </div> 
-        <div class="mb-4"> 
-            <label class="form-label">Enlace de acceso</label> 
-            <input wire:model="enlace_videoconf" type="url" class="form-control" 
-                placeholder="https://zoom.us/j/..."> 
-            <div class="form-text"> 
-                Genera la reunion en tu cuenta personal y pega el enlace aqui. 
-            </div> 
-            @error("enlace_videoconf") 
-                <span class="text-danger small">{{ $message }}</span> 
-            @enderror 
-        </div> 
-    @endif 
-} 
+}
