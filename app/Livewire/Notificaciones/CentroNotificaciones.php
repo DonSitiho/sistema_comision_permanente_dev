@@ -5,10 +5,12 @@ namespace App\Livewire\Notificaciones;
 
 use Livewire\Component;
 use Illuminate\Support\Facades\Auth;
+use Livewire\Attributes\On;
 
 class CentroNotificaciones extends Component
 {
-    protected $listeners = ["notificacion-nueva" => "$refresh"];
+    //protected $listeners = ["notificacion-nueva" => "$refresh"];
+    #[On('notificacion-nueva')]
     public function marcarLeida(int $id): void
     {
         $notif = Auth::user()->notificaciones()->findOrFail($id);
