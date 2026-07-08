@@ -55,6 +55,16 @@
 					</div>
 					<div class="menu-item">
 						<!--begin:Menu link-->
+						<a class="menu-link {{ request()->routeIs('mis-convocatorias') ? 'active' : '' }}" href="{{ route('mis-convocatorias') }}">
+							<span class="menu-bullet">
+								<span class="bullet bullet-dot"></span>
+							</span>
+							<span class="menu-title">Convocatorias Generales</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					<div class="menu-item">
+						<!--begin:Menu link-->
 						<a class="menu-link {{ request()->routeIs('crear-convocatoria') ? 'active' : '' }}" href="{{ route('crear-convocatoria') }}">
 							<span class="menu-bullet">
 								<span class="bullet bullet-dot"></span>
@@ -80,6 +90,19 @@
 					<!--end:Menu item-->
 				</div>
 				<!--end:Menu sub-->
+			</div>
+			<!--end:Menu item-->
+			<!--begin:Menu item-->
+			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('historial-notificaciones') ? 'here show' : '' }}">
+				<!--begin:Menu link-->
+				<a {{ request()->routeIs('historial-notificaciones') ? 'active' : '' }}" href="{{ route('historial-notificaciones') }}">
+					<span class="menu-link">
+						<span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+						<span class="menu-title">Historial de Notificaciones</span>
+						<!-- <span class="menu-arrow"></span> -->
+					</span>
+				</a>
+				<!--end:Menu link-->
 			</div>
 			<!--end:Menu item-->
 			<!--begin:Menu item-->

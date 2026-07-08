@@ -11,10 +11,7 @@
 			</span>
 			<!--end:Menu link-->
 			<!--begin:Menu sub-->
-			<div class="p-0 w-100 w-lg-1000px">
-				<livewire:notificaciones.centro-notificaciones />
-			</div>
-			<div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown p-0 w-100 w-lg-850px">
+			<div class="menu-sub menu-sub-lg-down-accordion menu-sub-lg-dropdown p-0 w-100 w-lg-750px">
 				Busca este texto para editar el contenido de este menu
 				{{-- @include(config('settings.KT_THEME_LAYOUT_DIR').'/partials/sidebar-layout/header/_menu/__dashboards') --}}
 			</div>

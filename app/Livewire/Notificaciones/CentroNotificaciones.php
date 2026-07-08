@@ -1,5 +1,4 @@
 <?php
-// app/Livewire/Notificaciones/CentroNotificaciones.php
 
 namespace App\Livewire\Notificaciones;
 
@@ -9,23 +8,49 @@ use Livewire\Attributes\On;
 
 class CentroNotificaciones extends Component
 {
-    //protected $listeners = ["notificacion-nueva" => "$refresh"];
+    public $notificacionSeleccionada = null;
+
     #[On('notificacion-nueva')]
-    public function marcarLeida(int $id): void
+    public function marcarLeida(int $id)
     {
-        $notif = Auth::user()->notificaciones()->findOrFail($id);
-        $notif->marcarLeida();
+        $user = Auth::user();
+        $notif = $user->notificaciones()->findOrFail($id);
+        $notif->leida_at = now(); 
+        $notif->save(); 
+
+        $this->notificacionSeleccionada = $notif;
+        $user->refresh(); 
+
+        $this->dispatch('mostrar-modal-notif');
     }
 
-    public function marcarTodasLeidas(): void
+    // Escucha de forma global los eventos lanzados por otros componentes (para la vista del historial de notificaciones)
+    #[On('notificacion-leida-externa')]
+    public function refrescarContadorYModal(int $id)
     {
-        Auth::user()->notificacionesNoLeidas()->update(["leida_at" => now()]);
+        $user = Auth::user();
+        $this->notificacionSeleccionada = $user->notificaciones()->findOrFail($id);
+        $user->refresh();
+
+        $this->dispatch('mostrar-modal-notif');
     }
+
+    public function marcarTodasLeidas()
+    {
+        $user = Auth::user();
+        $user->notificacionesNoLeidas()->update(["leida_at" => now()]);
+        $user->refresh();
+    }
+
+    public function verTodas()
+    {
+        return redirect()->route('historial-notificaciones');
+    }
+    
     public function render()
     {
-
         return view("livewire.notificaciones.centro-notificaciones", [
-            "notificaciones" => Auth::user()->notificaciones()->limit(15)->get(),
+            "notificaciones" => Auth::user()->notificaciones()->orderBy('created_at', 'desc')->limit(5)->get(),
             "contador" => Auth::user()->notificacionesNoLeidas()->count(),
         ]);
     }

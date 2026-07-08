@@ -35,6 +35,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('pages.misConvocatorias');})
         ->middleware(['auth'])->name('mis-convocatorias');
 
+    //Historial de notificaciones
+    Route::get('/historial-notificaciones', function () {
+        return view('pages.verHistorialNotificaciones');})
+        ->middleware(['auth'])->name('historial-notificaciones');
+    
 });
 
 Route::get('/error', function () {
