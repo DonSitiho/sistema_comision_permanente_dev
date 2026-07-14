@@ -55,6 +55,13 @@ return [
             'use_path_style_endpoint' => env('AWS_USE_PATH_STYLE_ENDPOINT', false),
             'throw' => false,
         ],
+        /**** Se agregó para trabajar localmente ****/
+        'documentos_cifrados' => [
+            'driver' => 'local',
+            'root' => storage_path('app/documentos_cifrados'),
+            'throw' => true,
+        ],
+        /*** FIn ***/
 
     ],
 

@@ -75,13 +75,33 @@
             @endif 
 
             {{-- El botón de guardar solo aparecerá si es una sesión nueva (Borrador) --}}
-            @if(!$esLectura)
+            <div class="text-end pt-4 mt-5">
+                <!-- Si el modal se abrió en modo de lectura, habilitamos el botón de cancelación -->
+                @if($esLectura && $convocatoriaReciente->estado != "cancelada")
+                    @if($convocatoriaReciente && $convocatoriaReciente->creada_por === Auth::id())
+                        <button type="button" 
+                                wire:click="cancelarSesionActual" 
+                                wire:confirm="¿Estás seguro de que deseas cancelar esta sesión? Esto habilitará la opción de configurar una sesión nueva para esta convocatoria."
+                                class="btn btn-danger me-2">
+                            <i class="ki-duotone ki-trash fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
+                            Cancelar Sesión Actual
+                        </button>
+                    @endif
+                @else
+                    <!-- Formulario normal en modo de creación -->
+                    <button type="button" wire:click="submit" class="btn btn-primary">
+                        Guardar Convocatoria
+                    </button>
+                @endif
+                <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar</button>
+            </div>
+            {{--@if(!$esLectura)
                 <div class="text-end pt-4 mt-5">
                     <button type="button" wire:click="submit" data-bs-dismiss="modal" class="btn btn-success">
                         Asignar y Enviar Sesión
                     </button>
                 </div>
-            @endif
+            @endif--}}
         </div>
     @endif
 </div>

@@ -6,6 +6,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use app\services\AuditService;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
 class Sesion extends Model
 {
@@ -60,4 +61,9 @@ class Sesion extends Model
     { 
         return in_array($this->tipo, ["virtual", "mixta"]); 
     } 
+
+    public function documentos(): MorphMany
+    {
+        return $this->morphMany(Documento::class, 'documentable');
+    }
 }

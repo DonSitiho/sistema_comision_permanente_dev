@@ -21,7 +21,7 @@ return new class extends Migration
             $table->dateTime("fecha_sesion"); 
             $table->string("lugar", 255)->nullable(); 
   
-            $table->enum("estado", ["borrador", "enviada", "cerrada"]) 
+            $table->enum("estado", ["borrador", "enviada", "cerrada","cancelada","pospuesta"]) 
                   ->default("borrador"); 
             $table->index("estado");
             $table->timestamps();

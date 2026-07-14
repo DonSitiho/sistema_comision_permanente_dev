@@ -5,6 +5,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Convocatoria extends Model
 {
@@ -22,8 +23,13 @@ class Convocatoria extends Model
         return $this->belongsTo(User::class, "creada_por"); 
     } 
   
-    public function sesion() 
+    /*public function sesion() 
     { 
         return $this->hasOne(Sesion::class); 
-    } 
+        
+    } */
+    public function sesion(): HasOne
+    {
+        return $this->hasOne(Sesion::class, 'convocatoria_id')->latestOfMany();
+    }
 }

@@ -8,7 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Livewire\Bitacora\BitacoraIndex;  // ← agregar
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Sesiones\SesionModal;
-
+use App\Models\Sesion;
 Route::middleware(['auth', 'verified'])->group(function () {
 
     Route::get('/', [DashboardController::class, 'index']);
@@ -26,7 +26,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
         ->name('admin.bitacora');
 
     //Crear Convocatoria
-    Route::get('/convocatorias', function () {
+    Route::get('/crear-convocatoria', function () {
         return view('pages.crearConvocatoria');})
         ->middleware(['auth'])->name('crear-convocatoria'); 
         
@@ -34,11 +34,22 @@ Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/mis-convocatorias', function () {
         return view('pages.misConvocatorias');})
         ->middleware(['auth'])->name('mis-convocatorias');
+    
+    //Convocatorias generales
+    Route::get('/convocatorias', function () {
+        return view('pages.misConvocatorias');})
+        ->middleware(['auth'])->name('convocatorias-generales');
 
     //Historial de notificaciones
     Route::get('/historial-notificaciones', function () {
         return view('pages.verHistorialNotificaciones');})
         ->middleware(['auth'])->name('historial-notificaciones');
+
+    //Documentos
+    Route::get('/documentos/{sesionId?}', function ($sesionId = null) {
+    $sesion = $sesionId ? Sesion::find($sesionId) : null;
+        return view('pages.documentos', compact('sesion'));
+    })->middleware(['auth'])->name('documentos');
     
 });
 

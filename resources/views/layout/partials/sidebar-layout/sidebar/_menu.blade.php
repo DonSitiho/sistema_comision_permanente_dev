@@ -44,24 +44,20 @@
 				<div class="menu-sub menu-sub-accordion">
 					<!--begin:Menu item-->
 					<div class="menu-item">
-						<!--begin:Menu link-->
 						<a class="menu-link {{ request()->routeIs('mis-convocatorias') ? 'active' : '' }}" href="{{ route('mis-convocatorias') }}">
 							<span class="menu-bullet">
 								<span class="bullet bullet-dot"></span>
 							</span>
 							<span class="menu-title">Mis Convocatorias</span>
 						</a>
-						<!--end:Menu link-->
 					</div>
 					<div class="menu-item">
-						<!--begin:Menu link-->
-						<a class="menu-link {{ request()->routeIs('mis-convocatorias') ? 'active' : '' }}" href="{{ route('mis-convocatorias') }}">
+						<a class="menu-link {{ request()->routeIs('convocatorias-generales') ? 'active' : '' }}" href="{{ route('convocatorias-generales') }}">
 							<span class="menu-bullet">
 								<span class="bullet bullet-dot"></span>
 							</span>
 							<span class="menu-title">Convocatorias Generales</span>
 						</a>
-						<!--end:Menu link-->
 					</div>
 					<div class="menu-item">
 						<!--begin:Menu link-->
@@ -103,6 +99,46 @@
 					</span>
 				</a>
 				<!--end:Menu link-->
+			</div>
+			<!--end:Menu item-->
+			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('dashboard') ? 'here show' : '' }}">
+				<!--begin:Menu link-->
+				<span class="menu-link">
+					<span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+					<span class="menu-title">Documentos</span>
+					<span class="menu-arrow"></span>
+				</span>
+				<!--end:Menu link-->
+				<!--begin:Menu sub-->
+				<div class="menu-sub menu-sub-accordion">
+					<!--begin:Menu item-->
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link {{ request()->routeIs('documentos') ? 'active' : '' }}" href="{{ route('documentos') }}">
+							<span class="menu-bullet">
+								<span class="bullet bullet-dot"></span>
+							</span>
+							<span class="menu-title">Documentos</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					<!--end:Menu item-->
+					<!--begin:Menu item-->
+					@can('view qr codes')
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link {{ request()->routeIs('dashboard') ? 'active' : '' }}" href="{{ route('dashboard') }}">
+							<span class="menu-bullet">
+								<span class="bullet bullet-dot"></span>
+							</span>
+							<span class="menu-title">Administrar</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					@endcan
+					<!--end:Menu item-->
+				</div>
+				<!--end:Menu sub-->
 			</div>
 			<!--end:Menu item-->
 			<!--begin:Menu item-->
