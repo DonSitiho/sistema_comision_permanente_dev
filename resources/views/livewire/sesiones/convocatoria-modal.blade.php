@@ -64,10 +64,10 @@
 
     <div class="text-end pt-4 mt-5">
         @if($this->convocatoria_id)
-            <button type="button" wire:click="posponerConvocatoria" class="btn btn-info">
+            <button id="sin_fecha" type="button" wire:click="posponerConvocatoria(true)" class="btn btn-info">
                 Posponer sin especificar la nueva fecha
             </button>
-            <button type="button" wire:click="posponerConvocatoria" class="btn btn-warning">
+            <button type="button" wire:click="posponerConvocatoria(false)" class="btn btn-warning">
                 Confirmar
             </button>
         @else

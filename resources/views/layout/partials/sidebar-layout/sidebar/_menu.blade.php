@@ -89,7 +89,7 @@
 			</div>
 			<!--end:Menu item-->
 			<!--begin:Menu item-->
-			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('historial-notificaciones') ? 'here show' : '' }}">
+			{{--<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('historial-notificaciones') ? 'here show' : '' }}">
 				<!--begin:Menu link-->
 				<a {{ request()->routeIs('historial-notificaciones') ? 'active' : '' }}" href="{{ route('historial-notificaciones') }}">
 					<span class="menu-link">
@@ -99,7 +99,7 @@
 					</span>
 				</a>
 				<!--end:Menu link-->
-			</div>
+			</div>--}}
 			<!--end:Menu item-->
 			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('dashboard') ? 'here show' : '' }}">
 				<!--begin:Menu link-->
@@ -193,6 +193,42 @@
 								<span class="bullet bullet-dot"></span>
 							</span>
 							<span class="menu-title">Permisos</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					<!--end:Menu item-->
+				</div>
+				<!--end:Menu sub-->
+			</div>
+			<!--end:Menu item-->
+			<!--begin:Menu item-->
+			<div class="menu-item pt-5">
+				<!--begin:Menu content-->
+				<div class="menu-content">
+					<span class="menu-heading fw-bold text-uppercase fs-7">Otro</span>
+				</div>
+				<!--end:Menu content-->
+			</div>
+			<!--end:Menu item-->
+			<!--begin:Menu item-->
+			<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('user-management.*') ? 'here show' : '' }}">
+				<!--begin:Menu link-->
+				<span class="menu-link">
+					<span class="menu-icon">{!! getIcon('abstract-28', 'fs-2') !!}</span>
+					<span class="menu-title">Más</span>
+					<span class="menu-arrow"></span>
+				</span>
+				<!--end:Menu link-->
+				<!--begin:Menu sub-->
+				<div class="menu-sub menu-sub-accordion">
+					<!--begin:Menu item-->
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link {{ request()->routeIs('historial-notificaciones') ? 'active' : '' }}" href="{{ route('historial-notificaciones') }}">
+							<span class="menu-bullet">
+								<span class="bullet bullet-dot"></span>
+							</span>
+							<span class="menu-title">Notificaciones</span>
 						</a>
 						<!--end:Menu link-->
 					</div>

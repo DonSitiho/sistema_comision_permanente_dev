@@ -51,8 +51,8 @@ class ConvocatoriaModal extends Component
   
         $convocatoria = Convocatoria::create([ 
             "folio"        => FolioService::generarConvocatoria(), 
-            "creada_por"   => Auth::id() ?? 1,
-            //"creada_por"   => Auth::id(),
+            //"creada_por"   => Auth::id() ?? 1,
+            "creada_por"   => Auth::id(),
             "titulo"       => $this->titulo, 
             "descripcion"  => $this->descripcion, 
             "fecha_sesion" => $this->fecha_sesion, 
@@ -64,9 +64,12 @@ class ConvocatoriaModal extends Component
         $this->reset(); 
     } 
 
-    public function posponerConvocatoria(): void
+    public function posponerConvocatoria(bool $sinFecha = false): void
     {
-        $this->validateOnly('fecha_sesion');
+        if (!$sinFecha) {
+            $this->validateOnly('fecha_sesion');
+        }
+       // $this->validateOnly('fecha_sesion');
         /*if (!$this->convocatoria_id) {
             $this->dispatch("error", "No se ha seleccionado ninguna convocatoria.");
             return;
@@ -79,8 +82,9 @@ class ConvocatoriaModal extends Component
                 $this->dispatch("error", "No tienes permisos. Solo puedes modificar las convocatorias que tú elaboraste.");
                 return;
             }
-
-            $convocatoria->fecha_sesion = $this->fecha_sesion; 
+            
+            //$convocatoria->fecha_sesion = $this->fecha_sesion; 
+            $convocatoria->fecha_sesion = $sinFecha ? null : $this->fecha_sesion; 
             $convocatoria->estado       = "pospuesta"; 
             $convocatoria->save();
 
@@ -93,13 +97,26 @@ class ConvocatoriaModal extends Component
                     mensaje: "La convocatoria con folio {$convocatoria->folio} ha sido pospuesta para el " . date('d/m/Y H:i', strtotime($this->fecha_sesion)),
                    // url_destino:
                 );
+            }*/
+           /* $mensajeNotificacion = $sinFecha 
+                ? "La convocatoria con folio {$convocatoria->folio} ha sido pospuesta (Fecha por definir)."
+                : "La convocatoria con folio {$convocatoria->folio} ha sido pospuesta para el " . date('d/m/Y H:i', strtotime($this->fecha_sesion)) . " Hrs.";
+            
+            if (class_exists(\App\Services\NotificacionService::class)) {
+                \App\Services\NotificacionService::crearNotificacion(
+                    user_id: $convocatoria->creada_por,
+                    tipo: 'sistema',
+                    titulo: 'Convocatoria Pospuesta',
+                    mensaje: $mensajeNotificacion
+                );
             }
 
             $this->dispatch('notificacion-nueva');*/
             $this->dispatch("success", "Convocatoria {$convocatoria->folio} pospuesta con éxito.");
             //$this->dispatch("convocatoria-pospuesta", id: $convocatoria->id);
             $this->dispatch("refresh-listado-convocatorias");
-            $this->reset(); 
+           // $this->reset(); 
+            $this->reset(['fecha_sesion', 'convocatoria_id']);
         } else {
             $this->dispatch("error", "No fue posible posponer la convocatoria.");
         }
@@ -135,52 +152,7 @@ class ConvocatoriaModal extends Component
             $this->dispatch("error", "No fue posible localizar la convocatoria.");
         }
     }
-    /*#[On('cargar-convocatoria-a-cancelar')]
-    public function cancelarConvocatoria(int $id): void
-    {
-        $convocatoria = Convocatoria::find($id);
-
-        if ($convocatoria) {
-            // Validamos que el usuario autenticado sea el creador
-            if ($convocatoria->creada_por !== Auth::id()) {
-                $this->dispatch("error", "No tienes permisos. Solo puedes cancelar las convocatorias que tú elaboraste.");
-                return;
-            }
-
-            // Usamos la transacción para asegurar consistencia atómica
-            DB::transaction(function () use ($convocatoria, $id) {
-                // 1. Actualizamos el estado de la convocatoria a cancelada
-                $convocatoria->update([
-                    'estado' => 'cancelada'
-                ]);
-
-                // 2. CORREGIDO: Buscamos la sesión usando $id o $convocatoria->id
-                // Si la convocatoria tiene una sesión asignada, también la cancelamos
-                \App\Models\Sesion::where('convocatoria_id', $id)->update([
-                    'estado' => 'cancelada'
-                ]);
-            });
-
-            // Opcional: Descomenta esto si deseas reactivar tus notificaciones automatizadas
-            /* if (class_exists(NotificacionService::class)) {
-                NotificacionService::crearNotificacion(
-                    user_id: $convocatoria->creada_por,
-                    tipo: 'sistema',
-                    titulo: 'Convocatoria Cancelada',
-                    mensaje: "La convocatoria con folio {$convocatoria->folio} y su sesión programada han sido canceladas.",
-                    url_destino: route('historial-notificaciones')
-                );
-                $this->dispatch('notificacion-nueva');
-            }*/
-
-    /*        $this->dispatch("success", "Convocatoria {$convocatoria->folio} y su sesión correspondiente fueron canceladas con éxito.");
-            $this->dispatch("refresh-listado-convocatorias");
-            $this->reset(); 
-        } else {
-            $this->dispatch("error", "No fue posible localizar la convocatoria.");
-        }
-    }*/
-            
+   
     public function render() 
     { 
         $convocatorias = Convocatoria::orderBy('created_at', 'desc')->get();
