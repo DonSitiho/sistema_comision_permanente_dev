@@ -13,7 +13,7 @@ class Convocatoria extends Model
   
     protected $fillable = [ 
         "folio", "creada_por", "titulo", "descripcion", 
-        "fecha_sesion", "lugar", "estado", 
+        "fecha_sesion", "lugar", "estado", "tipo_conv"
     ]; 
   
     protected $casts = ["fecha_sesion" => "datetime"]; 

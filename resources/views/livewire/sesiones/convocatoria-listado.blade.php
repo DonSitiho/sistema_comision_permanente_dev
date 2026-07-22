@@ -31,6 +31,7 @@
                 <thead>
                     <tr class="fw-bold text-muted fs-6">
                         <th class="min-w-100px Folio">Folio</th>
+                        <th class="min-w-150px">Convocatoria</th>
                         <th class="min-w-150px">Título</th>
                         <th class="min-w-150px">Descripción</th>
                         <th class="min-w-150px">Fecha Sesión</th>
@@ -44,6 +45,7 @@
                     @forelse($convocatorias as $convocatoria)
                         <tr wire:key="row-convocatoria-{{ $convocatoria->id }}">
                             <td><span class="text-gray-800 fw-bold fs-6">{{ $convocatoria->folio }}</span></td>
+                            <td><span class="text-gray-800 fw-bold fs-6">{{ $convocatoria->tipo_conv }}</span></td>
                             <td><span class="text-gray-800 fw-semibold fs-6">{{ $convocatoria->titulo }}</span></td>
                             <td><span class="text-gray-800 fs-6">{{ Str::limit($convocatoria->descripcion, 50) }}</span></td>
                             <td><span class="text-gray-800 fs-6">{{ $convocatoria->fecha_sesion ? $convocatoria->fecha_sesion->format('d/m/Y - H:i') . ' Hrs.' : 'Sin fecha' }}</span></td>
@@ -119,7 +121,7 @@
 
     <!-- MODAL 1: NUEVA SESIÓN -->
     <div class="modal fade" tabindex="-1" id="kt_modal_1" wire:ignore.self>
-        <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-dialog modal-dialog-centered mw-1000px">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold fs-4">Asignar Configuración de Sesión</h5>
@@ -134,7 +136,7 @@
 
     <!-- MODAL 2: VER SESIÓN GUARDADA -->
     <div class="modal fade" tabindex="-1" id="kt_modal_2" wire:ignore.self>
-        <div class="modal-dialog modal-dialog-centered mw-650px">
+        <div class="modal-dialog modal-dialog-centered mw-1000px">
             <div class="modal-content">
                 <div class="modal-header">
                     <h5 class="modal-title fw-bold fs-4">Datos de Sesión Registrada</h5>
@@ -178,20 +180,24 @@
                         <div class="bg-light-success rounded p-5 mb-6 border border-success border-dashed text-start">
                             <div class="row g-3">
                                 <div class="col-sm-6">
+                                    <span class="text-muted d-block fs-7 fw-bold">CONVOCATORIA</span>
+                                    <span class="text-gray-800 fw-semibold fs-6">{{ $convocatoriaSeleccionada->tipo_conv }}</span>
+                                </div>
+                                <div class="col-sm-6">
                                     <span class="text-muted d-block fs-7 fw-bold">TÍTULO</span>
                                     <span class="text-gray-800 fw-semibold fs-6">{{ $convocatoriaSeleccionada->titulo }}</span>
                                 </div>
                                 <div class="col-sm-6">
-                                    <span class="text-muted d-block fs-7 fw-bold">DESCRIPCIÓN</span>
-                                    <span class="text-gray-800 fw-bold fs-5">{{ Str::limit($convocatoriaSeleccionada->descripcion, 40) }}</span>
+                                    <span class="text-muted d-block fs-7 fw-bold">LUGAR</span>
+                                    <span class="text-gray-800 fs-6">{{ $convocatoriaSeleccionada->lugar ?? 'Sin definir' }}</span>
                                 </div>
                                 <div class="col-sm-6">
                                     <span class="text-muted d-block fs-7 fw-bold">FECHA Y HORA</span>
                                     <span class="text-gray-800 fs-6">{{ $convocatoriaSeleccionada->fecha_sesion ? $convocatoriaSeleccionada->fecha_sesion->format('d/m/Y - H:i') . ' Hrs.' : 'N/A' }}</span>
                                 </div>
-                                <div class="col-sm-6">
-                                    <span class="text-muted d-block fs-7 fw-bold">LUGAR</span>
-                                    <span class="text-gray-800 fs-6">{{ $convocatoriaSeleccionada->lugar ?? 'Sin definir' }}</span>
+                                <div class="col-sm-12">
+                                    <span class="text-muted d-block fs-7 fw-bold">DESCRIPCIÓN</span>
+                                    <span class="text-gray-800 fw-bold fs-5">{{ Str::limit($convocatoriaSeleccionada->descripcion, 40) }}</span>
                                 </div>
                             </div>
                         </div>

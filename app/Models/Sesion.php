@@ -15,11 +15,14 @@ class Sesion extends Model
     protected $fillable = [ 
         "convocatoria_id", "tipo", "estado", 
         "enlace_videoconf", "plataforma", "creada_por", 
+        "hora_inicio", "hora_fin", "descripcion_sesion", "num_enlace_videoconf", "cod_acceso_videoconf", 
     ]; 
   
     protected $casts = [ 
         "videoconf_metadata"      => "array", 
         "videoconf_sincronizado"  => "boolean", 
+        'hora_inicio' => 'datetime:H:i',
+        'hora_fin'    => 'datetime:H:i',
     ]; 
   
     public function convocatoria() { return $this->belongsTo(Convocatoria::class); } 
