@@ -1,122 +1,228 @@
 <div>
-    <!-- Buscador por folio, título y fecha -->
-    <div class="d-flex justify-content-end w-100 mb-5">
-        <div class="position-relative w-25">
-            <span class="position-absolute top-50 translate-middle-y ms-4">
-                <i class="ki-duotone ki-magnifier fs-2 text-gray-500">
-                    <span class="path1"></span><span class="path2"></span>
-                </i>
-            </span>
-            <input type="text" 
-                wire:model.live.debounce.300ms="buscar"
-                class="form-control form-control-solid ps-12 pe-5"
-                placeholder="Buscar convocatoria"
-                autocomplete="off" />
+    <style>
+        /* Estilo del botón de filtro */
+        .select-inactivo {
+            background-color: #f5f8fa !important;
+            color: #5e6278 !important;
+            font-weight: 600 !important;
+        }
+
+        .select-activo {
+            background-color: rgba(31, 56, 100, 0.12) !important;
+            color: #1F3864 !important;
+            border: 1px solid rgba(31, 56, 100, 0.25) !important;
+            font-weight: 700 !important;
+        }
+    </style>
+
+    <div class="d-flex flex-wrap flex-stack mb-6 gap-3">
+        <h1 class="fw-bold text-gray-900 my-0 fs-2">
+            {{ $alcance === 'propias' ? 'Mis Convocatorias y Sesiones' : 'Listado General de Convocatorias' }}
+        </h1>
+
+        <div class="d-flex align-items-center gap-3 flex-wrap">
+            <!-- Buscador -->
+            <div class="position-relative">
+                <span class="position-absolute top-50 translate-middle-y ms-4">
+                    <i class="ki-duotone ki-magnifier fs-3 text-gray-500">
+                        <span class="path1"></span><span class="path2"></span>
+                    </i>
+                </span>
+                <input type="text" 
+                    wire:model.live.debounce.300ms="buscar"
+                    class="form-control form-control-solid ps-12 pe-4 h-40px fs-7 w-200px w-md-230px border-0"
+                    placeholder="Buscar convocatoria"
+                    autocomplete="off" />
+            </div>
+
+            <!-- Filtro por estatus -->
+            <div class="position-relative" x-data="{ open: false }" @click.outside="open = false">
+                <button type="button" 
+                        @click="open = !open" 
+                        class="btn h-40px fs-7 rounded-3 d-flex align-items-center justify-content-between px-4 transition-all border-0 w-220px {{ !empty($filtroEstatus) ? 'select-activo' : 'select-inactivo' }}">
+                    <span class="text-truncate fw-semibold">
+                        @if(empty($filtroEstatus)) 🌐 Todas las convocatorias
+                        @elseif($filtroEstatus === 'mis_convocatorias') ⭐ Mis Convocatorias
+                        @elseif($filtroEstatus === 'borrador') 📝 Borrador
+                        @elseif($filtroEstatus === 'enviada') 📤 Enviada
+                        @elseif($filtroEstatus === 'pospuesta') ⏳ Pospuesta
+                        @elseif($filtroEstatus === 'cerrada') 🔒 Cerrada
+                        @elseif($filtroEstatus === 'cancelada') ❌ Cancelada
+                        @endif
+                    </span>
+                    <i class="ki-duotone ki-down fs-5 ms-2 flex-shrink-0" :class="{ 'rotate-180': open }"></i>
+                </button>
+
+                <div x-show="open" 
+                    x-cloak 
+                    class="position-absolute end-0 bg-white p-2 shadow-lg rounded-3 mt-1 fs-7 border-0 min-w-100"
+                    style="z-index: 9999; display: none; white-space: nowrap;">
+                    
+                    <button type="button" 
+                            class="dropdown-item rounded py-2 px-3 fw-semibold w-100 text-start text-gray-700 btn-active-light-primary mb-1 {{ $filtroEstatus === '' ? 'bg-light-primary text-primary' : '' }}" 
+                            wire:click="seleccionarEstatus('')" @click="open = false">
+                        🌐 Todas las convocatorias
+                    </button>
+
+                    @if($alcance !== 'propias')
+                        <button type="button" 
+                                class="dropdown-item rounded py-2 px-3 fw-bold w-100 text-start text-gray-700 btn-active-light-primary mb-1 {{ $filtroEstatus === 'mis_convocatorias' ? 'bg-light-primary text-primary' : '' }}" 
+                                wire:click="seleccionarEstatus('mis_convocatorias')"  @click="open = false">
+                            ⭐ Mis Convocatorias
+                        </button>
+                    @endif
+
+                    <button type="button" 
+                            class="dropdown-item rounded py-2 px-3 fw-semibold w-100 text-start text-gray-700 btn-active-light-primary mb-1 {{ $filtroEstatus === 'borrador' ? 'bg-light-primary text-primary' : '' }}" 
+                            wire:click="seleccionarEstatus('borrador')" @click="open = false">
+                        📝 Borrador
+                    </button>
+
+                    <button type="button" 
+                            class="dropdown-item rounded py-2 px-3 fw-semibold w-100 text-start text-gray-700 btn-active-light-primary mb-1 {{ $filtroEstatus === 'enviada' ? 'bg-light-primary text-primary' : '' }}" 
+                            wire:click="seleccionarEstatus('enviada')" @click="open = false">
+                        📤 Enviada
+                    </button>
+
+                    <button type="button" 
+                            class="dropdown-item rounded py-2 px-3 fw-semibold w-100 text-start text-gray-700 btn-active-light-primary mb-1 {{ $filtroEstatus === 'pospuesta' ? 'bg-light-primary text-primary' : '' }}" 
+                            wire:click="seleccionarEstatus('pospuesta')" @click="open = false">
+                        ⏳ Pospuesta
+                    </button>
+
+                    <button type="button" 
+                            class="dropdown-item rounded py-2 px-3 fw-semibold w-100 text-start text-gray-700 btn-active-light-primary mb-1 {{ $filtroEstatus === 'cerrada' ? 'bg-light-primary text-primary' : '' }}" 
+                            wire:click="seleccionarEstatus('cerrada')" @click="open = false">
+                        🔒 Cerrada
+                    </button>
+
+                    <button type="button" 
+                            class="dropdown-item rounded py-2 px-3 fw-semibold w-100 text-start text-gray-700 btn-active-light-primary {{ $filtroEstatus === 'cancelada' ? 'bg-light-primary text-primary' : '' }}" 
+                            wire:click="seleccionarEstatus('cancelada')" @click="open = false">
+                        ❌ Cancelada
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <!-- Listado de convocatorias -->
-    <div class="card card-flush shadow-sm p-6">
-        <!--<div class="card-header pt-2 ps-0">
-            <h3 class="card-title fw-bold text-gray-800 fs-2">Listado de Convocatorias</h3>
-        </div>-->
-        <div class="card-header pt-2 ps-0">
-            <h3 class="card-title fw-bold text-gray-800 fs-2">
-                {{ $alcance === 'propias' ? 'Mis Convocatorias y Sesiones' : 'Listado General de Convocatorias' }}
-            </h3>
-        </div>
 
-        <div class="table-responsive mt-4">
-            <table class="table table-row-dashed table-row-gray-300 align-middle gs-0 gy-4">
-                <thead>
-                    <tr class="fw-bold text-muted fs-6">
-                        <th class="min-w-100px Folio">Folio</th>
-                        <th class="min-w-150px">Convocatoria</th>
-                        <th class="min-w-150px">Título</th>
-                        <th class="min-w-150px">Descripción</th>
-                        <th class="min-w-150px">Fecha Sesión</th>
-                        <th class="min-w-100px">Lugar</th>
-                        <th class="min-w-100px">Estado Convocatoria</th>
-                        <th class="min-w-100px">Estado Sesión</th>
-                        <th class="min-w-100px text-end">Acciones</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($convocatorias as $convocatoria)
-                        <tr wire:key="row-convocatoria-{{ $convocatoria->id }}">
-                            <td><span class="text-gray-800 fw-bold fs-6">{{ $convocatoria->folio }}</span></td>
-                            <td><span class="text-gray-800 fw-bold fs-6">{{ $convocatoria->tipo_conv }}</span></td>
-                            <td><span class="text-gray-800 fw-semibold fs-6">{{ $convocatoria->titulo }}</span></td>
-                            <td><span class="text-gray-800 fs-6">{{ Str::limit($convocatoria->descripcion, 50) }}</span></td>
-                            <td><span class="text-gray-800 fs-6">{{ $convocatoria->fecha_sesion ? $convocatoria->fecha_sesion->format('d/m/Y - H:i') . ' Hrs.' : 'Sin fecha' }}</span></td>
-                            <td><span class="text-gray-800 fs-6">{{ $convocatoria->lugar ?? 'N/A' }}</span></td>
-                            <td>
-                                @if($convocatoria->estado === 'borrador')
-                                    <span class="badge badge-light-warning fw-bold">Borrador</span>
-                                @elseif($convocatoria->estado === 'enviada')
-                                    <span class="badge badge-light-success fw-bold">Enviada</span>
-                                @elseif($convocatoria->estado === 'pospuesta')
-                                    <span class="badge badge-light-info fw-bold">Pospuesta</span>
-                                @elseif($convocatoria->estado === 'cancelada')
-                                    <span class="badge badge-light-danger fw-bold">Cancelada</span>
+    <div class="row g-6 mb-8">
+        @forelse($convocatorias as $convocatoria)
+            <div class="col-md-6 col-xl-4" wire:key="card-convocatoria-{{ $convocatoria->id }}">
+                <div class="card card-custom h-100 shadow-sm border border-gray-200 hover-elevation-2 transition-all">
+
+                    <div class="card-body p-6 d-flex flex-column justify-content-between">
+                        <div>
+                            <!-- Header de la tarjeta -->
+                            <div class="d-flex align-items-center justify-content-between mb-3">
+                                <span class="text-gray-500 fw-bold fs-7">
+                                    Folio: <strong class="text-gray-800">#{{ $convocatoria->folio }}</strong>
+                                </span>
+                               
+                                <div>
+                                    @if($convocatoria->estado === 'cancelada')
+                                        <span class="badge badge-light-danger fs-8" title="Convocatoria Cancelada">
+                                            <i class="ki-duotone ki-lock fs-7 text-danger me-1"></i> Cancelada
+                                        </span>
+                                    @else
+                                        <button type="button" 
+                                                wire:click.prevent="prepararOpciones({{ $convocatoria->id }})" 
+                                                class="btn btn-sm btn-icon border-0" 
+                                                {{--style="background-color: rgba(31, 56, 100, 0.08) !important;"--}}
+                                                title="Opciones">
+                                            <i class="ki-duotone ki-dots-horizontal fs-2" style="color: #1F3864 !important;">
+                                                <span class="path1" style="color: #1F3864 !important;"></span>
+                                                <span class="path2" style="color: #1F3864 !important;"></span>
+                                                <span class="path3" style="color: #1F3864 !important;"></span>
+                                            </i>
+                                        </button>
+                                    @endif
+                                </div>       
+                            </div>
+
+                            <h3 class="fs-4 fw-bold mb-2 text-truncate" title="{{ $convocatoria->titulo }}">
+                                <span class="titulo-azul-custom">{{ $convocatoria->titulo }}</span>
+                            </h3>
+
+                            <div class="d-flex align-items-center mb-4">
+                                @if(Str::contains(Str::lower($convocatoria->tipo_conv), ['virtual', 'mixta']))
+                                    <i class="ki-duotone ki-screen fs-4 me-2" style="color: #1F3864 !important;">
+                                        <span class="path1" style="color: #1F3864 !important;"></span>
+                                        <span class="path2" style="color: #1F3864 !important;"></span>
+                                        <span class="path3" style="color: #1F3864 !important;"></span>
+                                        <span class="path4" style="color: #1F3864 !important;"></span>
+                                    </i>
+                                @else
+                                    <i class="ki-duotone ki-document fs-4 me-2" style="color: #1F3864 !important;">
+                                        <span class="path1" style="color: #1F3864 !important;"></span>
+                                        <span class="path2" style="color: #1F3864 !important;"></span>
+                                    </i>
                                 @endif
-                            </td>
-                            <td>
+                               <span class="text-gray-700 fw-bold fs-7">
+                                    {{ $convocatoria->tipo_conv }} / {{ $convocatoria->sesion?->tipo ?? 'Sin sesión' }}
+                                </span>
+                            </div>
+
+                            <div class="d-flex flex-column gap-2 mb-5">
+                                <div class="d-flex align-items-center text-gray-600 fs-7">
+                                    <i class="ki-duotone ki-calendar fs-5 me-2 text-gray-500">
+                                        <span class="path1"></span><span class="path2"></span>
+                                    </i>
+                                    <span>{{ $convocatoria->fecha_sesion ? $convocatoria->fecha_sesion->format('d/m/Y - H:i') . ' Hrs.' : 'Sin fecha asignada' }}</span>
+                                </div>
+
+                                <div class="d-flex align-items-center text-gray-600 fs-7">
+                                    <i class="ki-duotone ki-geolocation fs-5 me-2 text-gray-500">
+                                        <span class="path1"></span><span class="path2"></span>
+                                    </i>
+                                    <span class="text-truncate">{{ $convocatoria->lugar ?? 'N/A' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="d-flex align-items-center justify-content-between pt-3 border-top border-gray-100 gap-2">
+                            <div>
+                                @if($convocatoria->estado === 'borrador')
+                                    <span class="badge badge-light-warning fw-bold px-3 py-2">Borrador</span>
+                                @elseif($convocatoria->estado === 'enviada')
+                                    <span class="badge badge-light-success fw-bold px-3 py-2">Enviada</span>
+                                @elseif($convocatoria->estado === 'pospuesta')
+                                    <span class="badge badge-light-info fw-bold px-3 py-2">Pospuesta</span>
+                                @elseif($convocatoria->estado === 'cerrada')
+                                    <span class="badge badge-light-secondary fw-bold px-3 py-2">Cerrada</span>
+                                @elseif($convocatoria->estado === 'cancelada')
+                                    <span class="badge badge-light-danger fw-bold px-3 py-2">Cancelada</span>
+                                @endif
+                            </div>
+
+                            <div>
                                 @if($convocatoria->sesion)
                                     @if($convocatoria->sesion->estado === 'convocada')
-                                        <span class="badge badge-light-success fw-bold">Convocada</span>
+                                        <span class="badge badge-light-success fw-bold px-3 py-2">Convocada</span>
                                     @elseif($convocatoria->sesion->estado === 'en_curso')
-                                        <span class="badge badge-light-info fw-bold">En Curso</span>
+                                        <span class="badge badge-light-info fw-bold px-3 py-2">En Curso</span>
                                     @elseif($convocatoria->sesion->estado === 'realizada')
-                                        <span class="badge badge-light-primary fw-bold">Realizada</span>
+                                        <span class="badge badge-light-primary fw-bold px-3 py-2">Realizada</span>
                                     @elseif($convocatoria->sesion->estado === 'cancelada')
-                                        <span class="badge badge-light-danger fw-bold">Cancelada</span>
+                                        <span class="badge badge-light-danger fw-bold px-3 py-2">Sesión Cancelada</span>
                                     @endif
                                 @else
-                                    <span class="text-muted fs-7 italic">Sin Sesión</span>
+                                    <span class="text-muted fs-8 italic">Sin Sesión</span>
                                 @endif
-                            </td>
-                            <td class="text-end">
-                                @if($convocatoria->estado === 'cancelada')
-                                    <span class="text-muted fs-7 fw-bold"><i class="ki-duotone ki-lock fs-6 text-muted me-1"></i> Convocatoria Cancelada</span> 
-                                @else
-                                    @if(!$convocatoria->sesion || ($convocatoria->sesion->estado !== 'realizada' && $convocatoria->sesion->estado !== 'en_curso'))
-                                        <button type="button" 
-                                            wire:click="prepararOpciones({{ $convocatoria->id }})" 
-                                            class="btn btn-sm btn-light-info fw-bold">
-                                            @if($convocatoria->creada_por === Auth::id())
-                                                Configurar Sesión
-                                            @else
-                                                Consultar Detalles
-                                            @endif
-                                        </button>
-                                    @endif
-                                    @if($convocatoria->creada_por === Auth::id() && $convocatoria->sesion && $convocatoria->sesion->estado === 'realizada')
-                                        <a href="{{ route('documentos', $convocatoria->sesion->id) }}" 
-                                        class="btn btn-sm btn-light-success fw-bold d-inline-flex align-items-center">
-                                            <i class="ki-duotone ki-cloud-upload fs-6 me-1">
-                                                <span class="path1"></span><span class="path2"></span>
-                                            </i>
-                                            Subir Documento
-                                        </a>
-                                    @endif
-                                    @if($convocatoria->creada_por === Auth::id() && $convocatoria->sesion && $convocatoria->sesion->estado !== 'realizada' && $convocatoria->sesion->estado !== 'en_curso')
-                                        <button type="button" wire:click="$dispatch('cargar-convocatoria-a-cancelar', { id: {{ $convocatoria->id }} })" 
-                                            wire:confirm="¿Estás seguro de que deseas cancelar de forma permanente esta convocatoria?" class="btn btn-sm btn-light-danger">
-                                            Cancelar Convocatoria
-                                        </button>
-                                    @endif
-                                @endif
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="8" class="text-center text-muted py-8 fs-6">No se encontraron convocatorias registradas.</td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @empty
+            <div class="col-12">
+                <div class="card card-dashed p-10 text-center">
+                    <div class="text-gray-500 fs-6 fw-semibold">
+                        No se encontraron convocatorias registradas con los criterios de búsqueda.
+                    </div>
+                </div>
+            </div>
+        @endforelse
     </div>
 
     <!-- MODAL 1: NUEVA SESIÓN -->
@@ -170,13 +276,12 @@
             <div class="modal-content shadow-lg">
                 <div class="modal-header bg-light">
                     <h5 class="modal-title fw-bold fs-4 text-gray-800">
-                        Opciones de Convocatoria Folio: <span class="text-primary">{{ $convocatoriaSeleccionada?->folio }}</span>
+                        Opciones de Convocatoria Folio: <span style="color: #1F3864;">{{ $convocatoriaSeleccionada?->folio }}</span>
                     </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body p-8">
                     @if($convocatoriaSeleccionada)
-                        <!-- Datos de la convocatoria -->
                         <div class="bg-light-success rounded p-5 mb-6 border border-success border-dashed text-start">
                             <div class="row g-3">
                                 <div class="col-sm-6">
@@ -201,10 +306,9 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Opciones para sesiones y convocatorias -->
+
                         <div class="d-flex flex-column gap-4">
                             @if(!$convocatoriaSeleccionada->sesion || $convocatoriaSeleccionada->estado === 'borrador')
-                                <!-- Configurar Datos de Sesión -->
                                 @if($convocatoriaSeleccionada->creada_por === Auth::id())
                                     <button type="button" wire:click="ejecutarConfigurar({{ $convocatoriaSeleccionada->id }})" 
                                         class="btn btn-light-primary py-4 w-100 fw-bold fs-5 text-start ps-8">
@@ -213,7 +317,6 @@
                                     </button>
                                 @endif
                             @else
-                                <!-- Ver Datos de Sesión Registrada -->
                                 <button type="button" wire:click="ejecutarVerDatos({{ $convocatoriaSeleccionada->id }})" 
                                     class="btn btn-light-info py-4 w-100 fw-bold fs-5 text-start ps-8">
                                     <i class="ki-duotone ki-eye fs-1 text-info me-3"><span class="path1"></span><span class="path2"></span></i>
@@ -221,14 +324,12 @@
                                 </button>
 
                                 @if($convocatoriaSeleccionada->creada_por === Auth::id())
-                                    <!-- Posponer Fecha / Hora -->
                                     <button type="button" wire:click="ejecutarPosponer({{ $convocatoriaSeleccionada->id }})" 
                                             class="btn btn-light-warning py-4 w-100 fw-bold fs-5 text-start ps-8">
                                         <i class="ki-duotone ki-time fs-1 text-warning me-3"><span class="path1"></span><span class="path2"></span></i>
                                         Posponer Fecha / Hora
                                     </button>
 
-                                    <!-- Cancelar Sesión Actual -->
                                     <button type="button" 
                                             wire:click="ejecutarCancelarSesion({{ $convocatoriaSeleccionada->id }})" 
                                             wire:confirm="¿Estás seguro de que deseas cancelar esta sesión? Esto habilitará la opción de configurar una sesión nueva."
@@ -238,6 +339,25 @@
                                         Cancelar Sesión Actual
                                     </button>                          
                                 @endif
+                            @endif
+
+                            @if($convocatoriaSeleccionada->creada_por === Auth::id() && $convocatoriaSeleccionada->sesion && $convocatoriaSeleccionada->sesion->estado === 'realizada')
+                                <a href="{{ route('documentos', $convocatoriaSeleccionada->sesion->id) }}" 
+                                   class="btn btn-light-success py-4 w-100 fw-bold fs-5 text-start ps-8">
+                                    <i class="ki-duotone ki-cloud-upload fs-1 text-success me-3"><span class="path1"></span><span class="path2"></span></i>
+                                    Subir Documento
+                                </a>
+                            @endif
+
+                            @if($convocatoriaSeleccionada->creada_por === Auth::id() && $convocatoriaSeleccionada->sesion && $convocatoriaSeleccionada->sesion->estado !== 'realizada' && $convocatoriaSeleccionada->sesion->estado !== 'en_curso')
+                                <button type="button" 
+                                        wire:click="$dispatch('cargar-convocatoria-a-cancelar', { id: {{ $convocatoriaSeleccionada->id }} })" 
+                                        wire:confirm="¿Estás seguro de que deseas cancelar de forma permanente esta convocatoria?" 
+                                        class="btn btn-light-danger py-4 w-100 fw-bold fs-5 text-start ps-8"
+                                        data-bs-dismiss="modal">
+                                    <i class="ki-duotone ki-cross-circle fs-1 text-danger me-3"><span class="path1"></span><span class="path2"></span></i>
+                                    Cancelar Convocatoria
+                                </button>
                             @endif
                         </div>
                     @else
@@ -285,6 +405,7 @@
 
         Livewire.on('refresh-listado-convocatorias', window.cerrarModalesMetronic);
         Livewire.on('refreshTable', window.cerrarModalesMetronic);
+        
         Livewire.on('mostrar-menu-opciones', () => {
             const modalPadreEl = document.getElementById('kt_modal_4');
             if (modalPadreEl) {
@@ -292,13 +413,16 @@
                 modalPadreEl.removeAttribute('aria-hidden');
                 modalPadreEl.style.zIndex = '';
                 
-                const instanciaPadre = new bootstrap.Modal(modalPadreEl, { focus: false });
+                let instanciaPadre = bootstrap.Modal.getInstance(modalPadreEl);
+                if (!instanciaPadre) {
+                    instanciaPadre = new bootstrap.Modal(modalPadreEl, { focus: false });
+                }
                 instanciaPadre.show();
             }
         });
 
         Livewire.on('abrir-submodal-seguro', (event) => {
-            const targetId = event.targetModal || event[0].targetModal;
+            const targetId = event.targetModal || (event[0] && event[0].targetModal);
             const subModalEl = document.getElementById(targetId);
             const modalPadreEl = document.getElementById('kt_modal_4');
             

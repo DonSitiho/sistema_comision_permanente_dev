@@ -22,6 +22,7 @@ class ConvocatoriaListado extends Component
             $this->alcance = "propias";
         }
     }
+    
     // Carga la convocatoria junto con su relación 'sesion' para las condicionales del Modal de configuración de sesión
     // Carga la convocatoria y le avisa de forma segura a JS que levante el menú
     public function prepararOpciones(int $id): void
@@ -65,27 +66,39 @@ class ConvocatoriaListado extends Component
     {
         $this->convocatoriaSeleccionada = null;
     }
-
+    
+    public function seleccionarEstatus($valor)
+    {
+        $this->filtroEstatus = $valor;
+    }
+    public $filtroEstatus = '';
     public function render()
     {
-       
-        $convocatorias = Convocatoria::with('sesion')
-            ->when($this->alcance === 'propias', function($query) {
-                $query->where('creada_por', Auth::id());
-            })
-            ->when($this->alcance === 'generales', function($query) {
-                $query->where('creada_por', '!=', Auth::id());
-            })
+        $query = Convocatoria::query()->with('sesion');
 
-            ->when($this->buscar, function($query) {
-                $query->where(function($q) {
-                    $q->where('folio', 'LIKE', '%' . $this->buscar . '%')
-                      ->orWhere('titulo', 'LIKE', '%' . $this->buscar . '%')
-                      ->orWhereRaw("DATE_FORMAT(fecha_sesion, '%d/%m/%Y') LIKE ?", ['%' . $this->buscar . '%']);
-                });
-            })
-            ->orderBy('created_at', 'desc')
-            ->get();
+        // 1. Buscador por folio, título o fecha
+        if ($this->buscar) {
+            $query->where(function($q) {
+                $q->where('folio', 'LIKE', '%' . $this->buscar . '%')
+                ->orWhere('titulo', 'LIKE', '%' . $this->buscar . '%')
+                ->orWhereRaw("DATE_FORMAT(fecha_sesion, '%d/%m/%Y') LIKE ?", ['%' . $this->buscar . '%']);
+            });
+        }
+
+        if ($this->filtroEstatus === 'mis_convocatorias') {
+            $query->where('creada_por', Auth::id());
+        } else {
+            if ($this->alcance === 'propias') {
+                $query->where('creada_por', Auth::id());
+            } elseif ($this->alcance === 'generales') {
+                //$query->where('creada_por', '!=', Auth::id());
+            }
+
+            if (!empty($this->filtroEstatus)) {
+                $query->where('estado', $this->filtroEstatus);
+            }
+        }
+        $convocatorias = $query->orderBy('created_at', 'desc')->get();
 
         return view("livewire.sesiones.convocatoria-listado", [
             'convocatorias' => $convocatorias
