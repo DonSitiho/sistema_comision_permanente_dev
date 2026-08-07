@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role'              => \Spatie\LaravelPermission\Middleware\RoleMiddleware::class,
             'role_or_permission'=> \Spatie\LaravelPermission\Middleware\RoleOrPermissionMiddleware::class,
         ]);
+
+          $middleware->web(append: [
+        \App\Http\Middleware\ComunicadosObligatorios::class,
+    ]);
+    
     })
     ->withEvents()
    /* ->withEvents(function ($events) {

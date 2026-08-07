@@ -70,6 +70,7 @@
 						<!--end:Menu link-->
 					</div>
 					<!--end:Menu item-->
+					
 					<!--begin:Menu item-->
 					@can('view qr codes')
 					<div class="menu-item">
@@ -88,6 +89,37 @@
 				<!--end:Menu sub-->
 			</div>
 			<!--end:Menu item-->
+			<!--begin:Menu item-->
+<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('dashboard') ? 'here show' : '' }}">
+        <span class="menu-link">
+                <span class="menu-icon">{!! getIcon('element-11', 'fs-2') !!}</span>
+                <span class="menu-title">Comunicados</span>
+                <span class="menu-arrow"></span>
+        </span>
+        <div class="menu-sub menu-sub-accordion">
+                <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('chat') ? 'active' : '' }}" href="{{ route('chat') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Mensajes</span>
+                        </a>
+                </div>
+                <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('comunicados') ? 'active' : '' }}" href="{{ route('comunicados') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Institucional</span>
+                        </a>
+                </div>
+                @can('crear comunicados')
+                <div class="menu-item">
+                        <a class="menu-link {{ request()->routeIs('comunicados.consola') || request()->routeIs('comunicados.nuevo') ? 'active' : '' }}" href="{{ route('comunicados.consola') }}">
+                                <span class="menu-bullet"><span class="bullet bullet-dot"></span></span>
+                                <span class="menu-title">Enviar Comunicados</span>
+                        </a>
+                </div>
+                @endcan
+        </div>
+</div>
+<!--end:Menu item-->
 			<!--begin:Menu item-->
 			{{--<div data-kt-menu-trigger="click" class="menu-item menu-accordion {{ request()->routeIs('historial-notificaciones') ? 'here show' : '' }}">
 				<!--begin:Menu link-->

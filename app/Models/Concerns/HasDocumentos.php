@@ -1,15 +1,14 @@
 <?php
 //app/Models/Concerns/HasDocumentos.php
-
 namespace App\Models\Concerns;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
+use App\Models\Documento;
+use Illuminate\Database\Eloquent\Relations\MorphMany;
 
-class HasDocumentos extends Model
+trait HasDocumentos
 {
-    public function documentos() 
-    { 
-        return $this->morphMany(Documento::class, "documentable"); 
-    } 
+    public function documentos(): MorphMany
+    {
+        return $this->morphMany(Documento::class, "documentable");
+    }
 }

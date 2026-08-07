@@ -16,7 +16,12 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        $this->call(ScpcSeeder::class);
+        $this->call([
+            ScpcSeeder::class,
+            ComunicadoCategoriaSeeder::class,
+            ComunicadoPermisosSeeder::class,
+        ]);
+        
         /*$this->call([
             UsersSeeder::class,
             RolesPermissionsSeeder::class,

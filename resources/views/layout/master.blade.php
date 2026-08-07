@@ -44,6 +44,11 @@
 
 <!--begin::Body-->
 <body {!! printHtmlClasses('body') !!} {!! printHtmlAttributes('body') !!}>
+@auth
+    @if($hayObligatoriosPendientes ?? false)
+        <livewire:comunicados.modal-obligatorio />
+    @endif
+@endauth
 
 @include('partials/theme-mode/_init')
 

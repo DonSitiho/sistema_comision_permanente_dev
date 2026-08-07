@@ -51,6 +51,28 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('pages.documentos', compact('sesion'));
     })->middleware(['auth'])->name('documentos');
     
+    //Mensajeria (Comunicacion)
+    Route::get('/chat', function () {
+        return view('pages.chat');
+    })->middleware(['auth'])->name('chat');
+
+    //Comunicados
+    Route::get('/comunicados', function () {
+        return view('pages.comunicados');
+    })->middleware(['auth'])->name('comunicados');
+
+    Route::get('/comunicados/nuevo', function () {
+        return view('pages.comunicados-nuevo');
+    })->middleware(['auth'])->name('comunicados.nuevo');
+
+    Route::get('/comunicados/{comunicado}/editar', function (\App\Models\Comunicado $comunicado) {
+        return view('pages.comunicados-nuevo', ['comunicadoId' => $comunicado->id]);
+    })->middleware(['auth'])->name('comunicados.editar');
+
+    Route::get('/comunicados-consola', function () {
+        return view('pages.comunicados-consola');
+    })->middleware(['auth'])->name('comunicados.consola');
+    
 });
 
 Route::get('/error', function () {

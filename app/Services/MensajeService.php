@@ -1,23 +1,37 @@
 <?php
-
 namespace App\Services;
-
 use App\Models\Conversacion;
 use App\Models\Mensaje;
 use App\Models\User;
-
+use Illuminate\Http\UploadedFile;
 class MensajeService
 {
     public static function enviar(
         Conversacion $conversacion,
         User $emisor,
-        string $contenido
+        string $contenido,
+        ?UploadedFile $adjunto = null
     ): Mensaje {
         $mensaje = Mensaje::create([
             "conversacion_id" => $conversacion->id,
             "emisor_id" => $emisor->id,
             "contenido" => $contenido,
         ]);
+
+        if ($adjunto) {
+            $contenidoBinario = file_get_contents($adjunto->getRealPath());
+            $rutaDestino = "mensaje_" . $mensaje->id . "/" . uniqid() . ".enc";
+            $rutaFinal = app(CifradoService::class)->cifrarYAlmacenar($contenidoBinario, $rutaDestino);
+
+            $mensaje->documentos()->create([
+                "nombre_original" => $adjunto->getClientOriginalName(),
+                "ruta_cifrada" => $rutaFinal,
+                "mime_type" => $adjunto->getMimeType(),
+                "tamano" => $adjunto->getSize(),
+                "subido_por" => $emisor->id,
+                "categoria" => "adjunto_chat",
+            ]);
+        }
 
         // El emisor marca su propio mensaje como leido al enviarlo
         $conversacion->participantes()
@@ -41,24 +55,21 @@ class MensajeService
         return $mensaje;
     }
 
-    // Crea una conversacion individual, o la retorna si ya existe entre ambos
-    public static function obtenerOCrearIndividual(User $a, User $b): Conversacion
+    // Abre (o reutiliza) el hilo 1:1 entre dos usuarios.
+    // clave_par = los dos IDs ordenados de menor a mayor: sin importar
+    // quien inicia el chat, la clave siempre queda igual para ese par,
+    // asi firstOrCreate nunca duplica el hilo.
+    public static function iniciarIndividual(User $a, User $b): Conversacion
     {
-        $existente = Conversacion::where("tipo", "individual")
-            ->whereHas("usuarios", fn($q) => $q->where("users.id", $a->id))
-            ->whereHas("usuarios", fn($q) => $q->where("users.id", $b->id))
-            ->first();
+        $clave = collect([$a->id, $b->id])->sort()->implode("-");
 
-        if ($existente) {
-            return $existente;
-        }
+        $conversacion = Conversacion::firstOrCreate(
+            ["clave_par" => $clave, "tipo" => "individual"],
+            ["creado_por" => $a->id],
+        );
 
-        $conversacion = Conversacion::create([
-            "tipo" => "individual",
-            "creada_por" => $a->id,
-        ]);
-
-        $conversacion->usuarios()->attach([$a->id, $b->id]);
+        $conversacion->participantes()->firstOrCreate(["user_id" => $a->id]);
+        $conversacion->participantes()->firstOrCreate(["user_id" => $b->id]);
 
         return $conversacion;
     }
@@ -71,10 +82,10 @@ class MensajeService
         ?int $sesionId = null
     ): Conversacion {
         $conversacion = Conversacion::create([
-            "tipo" => "grupal",
+            "tipo" => "grupo",
             "nombre" => $nombre,
-            "sesion_id" => $sesionId,
-            "creada_por" => $creador->id,
+            "sesion_origen_id" => $sesionId,
+            "creado_por" => $creador->id,
         ]);
 
         // El creador siempre es admin del grupo
