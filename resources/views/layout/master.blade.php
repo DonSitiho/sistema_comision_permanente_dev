@@ -37,8 +37,6 @@
         {!! sprintf('<link rel="stylesheet" href="%s">', asset($path)) !!}
     @endforeach
     <!--end::Custom Stylesheets-->
-    <link rel="stylesheet" href="{{ asset('livewire/livewire.css') }}">
-    @livewireStyles
 </head>
 <!--end::Head-->
 
@@ -72,8 +70,6 @@
     {!! sprintf('<script src="%s"></script>', asset($path)) !!}
 @endforeach
 <!--end::Custom Javascript-->
-@stack('scripts')
-<!--end::Javascript-->
 
 <script>
     document.addEventListener('livewire:init', () => {
@@ -103,13 +99,10 @@
         });
     });
 </script>
-    <script src="{{ asset('assets/plugins/global/plugins.bundle.js') }}"></script>
-    <script src="{{ asset('assets/js/scripts.bundle.js') }}"></script>
-    <script src="{{ asset('assets/plugins/custom/datatables/datatables.bundle.js') }}"></script>
-    <script src="{{ asset('livewire/livewire.js') }}" data-csrf="{{ csrf_token() }}"></script>
-    @livewireScripts
 
-    
+@stack('scripts')
+<!--end::Javascript-->
+
 </body>
 <!--end::Body-->
 
