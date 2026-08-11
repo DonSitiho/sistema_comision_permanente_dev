@@ -12,7 +12,8 @@
             </div>
         </div>
     @else
-        <div class="d-flex flex-column flex-column-fluid" wire:key="container-modal-{{ $convocatoriaReciente->id }}-{{ $esLectura ? 'read' : 'edit' }}">
+        <div class="d-flex flex-column flex-column-fluid position-relative" 
+            wire:key="container-modal-{{ $convocatoriaReciente->id }}-{{ $esLectura ? 'read' : 'edit' }}">
             <div class="toolbar mb-4" id="kt_toolbar">
                 <div class="container-fluid p-0 d-flex flex-stack flex-wrap">
                     <div class="page-title d-flex flex-column me-3">
@@ -28,7 +29,6 @@
                 </div>
             </div>
 
-            <!-- Modalidad -->
             <div class="mb-4">
                 <label class="form-label fw-bold">Modalidad de la Sesión</label>
                 <select wire:model.live="tipo" class="form-select form-select-solid" @disabled($esLectura)> 
@@ -37,9 +37,9 @@
                     <option value="virtual">Virtual</option> 
                     <option value="mixta">Mixta</option> 
                 </select> 
+                @error("tipo") <span class="text-danger small d-block mt-1">{{ $message }}</span> @enderror
             </div>
 
-            <!-- Descripción de la Sesión -->
             <div class="mb-4" wire:key="input-desc-box-{{ $convocatoriaReciente->id }}">
                 <label class="form-label fw-bold">Descripción de la Sesión</label>
                 <div class="input-group input-group-solid">
@@ -50,17 +50,14 @@
                               placeholder="Descripción detallada de la sesión ..." 
                               @readonly($esLectura)></textarea>
                 </div>
-                @error("descripcion_sesion") <span class="text-danger small">{{ $message }}</span> @enderror 
+                @error("descripcion_sesion") <span class="text-danger small d-block mt-1">{{ $message }}</span> @enderror 
             </div>
 
             @if($tipo && $tipo !== '#')
                 <div class="content d-flex flex-column-fluid mb-4" id="kt_content">
                     <div class="container-fluid p-0">
                         <div class="row g-5">
-                            
-                            <!-- MODALIDAD VIRTUAL O MIXTA -->
                             @if ($this->requiereVideoconf()) 
-                                <!-- Columna Izquierda (Plataforma + Enlace) -->
                                 <div class="col-xl-8 d-flex flex-column gap-5">
                                     <div class="card card-flush shadow-sm">
                                         <div class="card-header border-0 pt-4 min-h-auto">
@@ -118,7 +115,7 @@
                                         </div>
                                     </div>
 
-                                    <!-- Detalles de Conexión -->
+                                    <!-- DETALLES DE CONEXIÓN -->
                                     <div class="card card-flush shadow-sm">
                                         <div class="card-header border-0 pt-4 min-h-auto">
                                             <h3 class="card-title align-items-start flex-column mb-0">
@@ -138,27 +135,34 @@
                                                         placeholder="https://zoom.us/j/..." 
                                                         @readonly($esLectura)> 
                                                 </div>
-                                                @error("enlace_videoconf") <span class="text-danger small">{{ $message }}</span> @enderror 
+                                                @error("enlace_videoconf") <span class="text-danger small d-block mt-1">{{ $message }}</span> @enderror 
                                             </div>
                                             <div class="row g-4">
                                                 <div class="col-md-6" wire:key="input-id-reunion-box-{{ $convocatoriaReciente->id }}">
                                                     <label class="form-label fw-bold text-gray-700">ID de la Reunión</label>
                                                     <input wire:model="num_enlace_videoconf" 
-                                                           wire:key="input-id-reunion-{{ $convocatoriaReciente->id }}"
-                                                           type="text" 
-                                                           class="form-control form-control-solid" 
-                                                           placeholder="Ingresar ID de la sesión" 
-                                                           @readonly($esLectura)> 
+                                                        wire:key="input-id-reunion-{{ $convocatoriaReciente->id }}"
+                                                        type="text" 
+                                                        inputmode="numeric"
+                                                        maxlength="15"
+                                                        oninput="this.value = this.value.replace(/[^0-9]/g, '');"
+                                                        class="form-control form-control-solid" 
+                                                        placeholder="Ej: 12345687899" 
+                                                        @readonly($esLectura)>
+
+                                               
+                                                    @error("num_enlace_videoconf") <span class="text-danger small d-block mt-1">{{ $message }}</span> @enderror
                                                 </div>
                                                 <div class="col-md-6" wire:key="input-code-box-{{ $convocatoriaReciente->id }}">
                                                     <label class="form-label fw-bold text-gray-700">Código de Acceso</label>
                                                     <div class="position-relative">
                                                         <input wire:model="cod_acceso_videoconf" 
                                                             wire:key="input-code-{{ $convocatoriaReciente->id }}"
-                                                            type="text" class="form-control form-control-solid" 
-                                                            placeholder="Ingresar código de acceso" 
+                                                            type="text" maxlength="8" class="form-control form-control-solid" 
+                                                            placeholder="Ej: 1ssN23" 
                                                             @readonly($esLectura)> 
                                                     </div>
+                                                    @error("cod_acceso_videoconf") <span class="text-danger small d-block mt-1">{{ $message }}</span> @enderror
                                                 </div>
                                             </div>
                                         </div>
@@ -178,7 +182,6 @@
                                         </div>
                                         <div class="card-body pt-3 pb-4">
                                             <div class="row g-3 justify-content-center">
-                                                <!-- Hora Inicio (Virtual) -->
                                                 <div class="col-6">
                                                     <label class="form-label fw-bold text-gray-700 fs-7">Inicio</label>
                                                     <div class="input-group input-group-sm input-group-solid flatpickr-time-container"
@@ -195,7 +198,10 @@
                                                                         altFormat: 'H:i \\H\\r\\s\\.',
                                                                         time_24hr: true, 
                                                                         position: 'above', 
-                                                                        static: false 
+                                                                        static: false, 
+                                                                        onChange: (selectedDates, dateStr) => {
+                                                                            $wire.set('hora_inicio', dateStr);
+                                                                        }
                                                                     }); 
                                                                 } 
                                                             } 
@@ -206,7 +212,6 @@
                                                         <span class="input-group-text {{ $esLectura ? '' : 'cursor-pointer' }} px-3" data-toggle><i class="bi bi-clock text-primary fs-5"></i></span>
                                                     </div>
                                                 </div>
-                                                <!-- Hora Fin (Virtual) -->
                                                 <div class="col-6">
                                                     <label class="form-label fw-bold text-gray-700 fs-7">Fin</label>
                                                     <div class="input-group input-group-sm input-group-solid flatpickr-time-container"
@@ -223,7 +228,10 @@
                                                                         altFormat: 'H:i \\H\\r\\s\\.',
                                                                         time_24hr: true, 
                                                                         position: 'above', 
-                                                                        static: false 
+                                                                        static: false,
+                                                                        onChange: (selectedDates, dateStr) => {
+                                                                            $wire.set('hora_fin', dateStr);
+                                                                        }
                                                                     }); 
                                                                 } 
                                                             } 
@@ -234,12 +242,15 @@
                                                             @disabled($esLectura)}/>
                                                         <span class="input-group-text {{ $esLectura ? '' : 'cursor-pointer' }} px-3" data-toggle><i class="bi bi-clock text-primary fs-5"></i></span>
                                                     </div>
+                                                    @error('hora_fin') 
+                                                        <span class="text-danger fs-8 fw-bold d-block mt-1">{{ $message }}</span> 
+                                                    @enderror
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
 
-                                    <!-- Invitados -->
+                                    <!-- INVITADOS VIRTUAL -->
                                     <div class="card card-flush shadow-sm">
                                         <div class="card-header border-0 pt-4 min-h-auto">
                                             <h3 class="card-title align-items-start mb-0">
@@ -247,10 +258,21 @@
                                                     <i class="ki-duotone ki-people fs-3 text-primary me-2"><span class="path1"></span><span class="path2"></span></i>
                                                     Invitados
                                                 </span>
-                                                <span class="badge badge-light-primary fw-bolder">12 Total</span>
+                                                <span class="badge badge-light-primary fw-bolder">{{ count($invitadosSeleccionados) }} Total</span>
                                             </h3>
                                         </div>
-                                        <div class="card-body pt-3 pb-4">
+                                        <div class="card-body pt-3 pb-4 d-flex flex-column gap-3">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-primary w-100 fw-bold py-3 rounded-3 d-flex align-items-center justify-content-center gap-2" 
+                                                    wire:click="abrirModalInvitados">
+                                                <i {{ $esLectura ? 'ki-eye' : 'ki-user-plus' }}><span class="path1"></span><span class="path2"></span></i>
+                                                {{ $esLectura ? 'Mostrar Invitados' : 'Gestionar Invitados' }}
+                                            </button>
+
+                                            @error('invitadosSeleccionados')
+                                                <span class="text-danger fs-8 fw-bold">{{ $message }}</span>
+                                            @enderror
+
                                             <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed p-3">
                                                 <div class="d-flex flex-stack flex-grow-1">
                                                     <div class="fw-semibold">
@@ -276,10 +298,21 @@
                                                     <i class="ki-duotone ki-people fs-3 text-primary me-2"><span class="path1"></span><span class="path2"></span></i>
                                                     Invitados
                                                 </span>
-                                                <span class="badge badge-light-primary fw-bolder">12 Total</span>
+                                                <span class="badge badge-light-primary fw-bolder">{{ count($invitadosSeleccionados) }} Total</span>
                                             </h3>
                                         </div>
-                                        <div class="card-body pt-3 pb-4 d-flex align-items-center">
+                                        <div class="card-body pt-3 pb-4 d-flex flex-column gap-3">
+                                            <button type="button" 
+                                                    class="btn btn-sm btn-primary fw-bold py-3 w-200px rounded-3 d-flex align-items-center justify-content-center gap-2" 
+                                                    wire:click="abrirModalInvitados">
+                                                <i {{ $esLectura ? 'ki-eye' : 'ki-user-plus' }}><span class="path1"></span><span class="path2"></span></i>
+                                                {{ $esLectura ? 'Mostrar Invitados' : 'Gestionar Invitados' }}
+                                            </button>
+
+                                            @error('invitadosSeleccionados')
+                                                <span class="text-danger fs-8 fw-bold">{{ $message }}</span>
+                                            @enderror
+
                                             <div class="notice d-flex bg-light-primary rounded border-primary border border-dashed p-3 w-100">
                                                 <div class="d-flex flex-stack flex-grow-1">
                                                     <div class="fw-semibold">
@@ -300,10 +333,9 @@
                 </div>
             @endif
 
-            <!-- BOTONES  -->
             <div class="text-end pt-3 mt-2 border-top">
                 @if($esLectura && $convocatoriaReciente->estado != "cancelada")
-                    @if($convocatoriaReciente && $convocatoriaReciente->creada_por === Auth::id())
+                    {{--@if($convocatoriaReciente && $convocatoriaReciente->creada_por === Auth::id())
                         <button type="button" 
                             wire:click="cancelarSesionActual" 
                             wire:confirm="¿Estás seguro de que deseas cancelar esta sesión? Esto habilitará la opción de configurar una sesión nueva para esta convocatoria."
@@ -311,7 +343,8 @@
                             <i class="ki-duotone ki-trash fs-4 me-1"><span class="path1"></span><span class="path2"></span></i>
                             Cancelar Sesión Actual
                         </button>
-                    @endif
+                    @endif--}}
+                    
                 @elseif(!$esLectura)
                     <button type="button" wire:click="submit" class="btn btn-sm btn-primary me-2">
                         Guardar Convocatoria
@@ -319,12 +352,149 @@
                 @endif
                 <button type="button" class="btn btn-sm btn-light" data-bs-dismiss="modal">Cerrar</button>
             </div>
+
+        </div>
+    @endif
+
+    @if($mostrarModalInvitados)
+        <div class="position-fixed top-0 start-0 w-100 h-100 d-flex align-items-center justify-content-center p-4" 
+            style="z-index: 999999 !important; background-color: rgba(0, 0, 0, 0.5); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px);">
+            
+            <div class="card rounded-4 border-0 shadow-lg p-2 mw-700px w-100 animation-bounce-in">
+                <div class="card-header border-0 pb-0 pt-4 px-6 d-flex align-items-center justify-content-between">
+                    <h3 class="card-title fw-bolder text-gray-900 fs-3 m-0">
+                        {{ $esLectura ? 'Lista de Invitados a la Sesión' : 'Agregar Invitados a la Sesión' }}
+                    </h3>
+                    <button type="button" 
+                            class="btn btn-icon btn-sm btn-active-light-secondary rounded-circle" 
+                            wire:click="cerrarModalInvitados">
+                        <i class="ki-duotone ki-cross fs-2 text-gray-600"><span class="path1"></span><span class="path2"></span></i>
+                    </button>
+                </div>
+
+                <div class="card-body py-4 px-6">
+                    @if(!$esLectura)
+                        <!-- Invitar a Todos -->
+                        <div class="bg-light-subtle rounded-3 p-3 mb-4 d-flex align-items-center justify-content-between border border-gray-200">
+                            <span class="fw-bold text-gray-800 fs-7 ms-2">Invitar a Todos</span>
+                            <button type="button" class="btn btn-sm text-white fw-bold fs-7 px-4 h-35px rounded-3" style="background-color: #0095FF;" wire:click="seleccionarTodos">
+                                Seleccionar Todos
+                            </button>
+                        </div>
+
+                        <!-- Elegir por regiones -->
+                        <div class="mb-4">
+                            <label class="form-label fw-bold text-gray-800 fs-7 mb-2">Por Regiones</label>
+                            <div class="d-flex flex-wrap gap-2">
+                                @foreach(['Centro', 'Ciénega', 'Oriente', 'Norte', 'Occidente', 'Sur'] as $reg)
+                                    <button type="button" 
+                                            wire:click="seleccionarPorRegion('{{ $reg }}')" 
+                                            class="btn btn-sm rounded-pill fw-bold fs-8 px-4 py-2 border {{ $regionFiltro === $reg ? 'btn-primary border-0 text-white' : 'btn-light text-gray-700' }}"
+                                            style="{{ $regionFiltro === $reg ? 'background-color: #0095FF !important;' : '' }}">
+                                        {{ $reg }}
+                                    </button>
+                                @endforeach
+                            </div>
+                        </div>
+
+                        <!-- Búsqueda Individual -->
+                        <div class="mb-5 position-relative">
+                            <label class="form-label fw-bold text-gray-800 fs-7 mb-2">Búsqueda Individual</label>
+                            <div class="position-relative">
+                                <span class="position-absolute top-50 translate-middle-y ms-4">
+                                    <i class="ki-duotone ki-magnifier fs-4 text-gray-500"><span class="path1"></span><span class="path2"></span></i>
+                                </span>
+                                <input type="text" 
+                                       wire:model.live.debounce.300ms="buscar_invitado"
+                                       class="form-control form-control-solid bg-white border border-gray-300 ps-12 pe-4 h-40px fs-7 w-100 rounded-3"
+                                       placeholder="Buscar usuario por nombre"
+                                       autocomplete="off" />
+                            </div>
+
+                            @if(!empty($buscar_invitado) && count($usuariosBusqueda) > 0)
+                                <div class="position-absolute start-0 end-0 bg-white border border-gray-300 rounded-3 shadow-lg mt-1 z-index-3 mh-150px overflow-y-auto">
+                                    @foreach($usuariosBusqueda as $user)
+                                        <div class="p-2 border-bottom hover-bg-light cursor-pointer d-flex align-items-center justify-content-between" wire:click="toggleInvitado({{ $user->id }})">
+                                            <span class="fs-8 fw-bold text-gray-800 ms-2">{{ $user->name }} ({{ $user->email }})</span>
+                                            <span class="badge {{ in_array($user->id, $invitadosSeleccionados) ? 'badge-danger' : 'badge-primary' }} fs-9">
+                                                {{ in_array($user->id, $invitadosSeleccionados) ? 'Quitar' : 'Agregar' }}
+                                            </span>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    @endif
+
+                    <div class="border-top pt-4">
+                        <div class="d-flex align-items-center justify-content-between mb-3">
+                            <span class="fw-bolder text-gray-800 fs-7 text-uppercase">
+                                Invitados Asignados <span class="badge badge-light-primary ms-1">{{ $invitadosAsignados->count() }} Personas</span>
+                            </span>
+                        </div>
+
+                        <div class="mh-250px overflow-y-auto pe-1">
+                            @if($invitadosAsignados->isEmpty())
+                                <div class="text-center py-6 text-gray-500 fs-7">No hay invitados asignados a esta sesión.</div>
+                            @else
+                                <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 g-2">
+                                    @foreach($invitadosAsignados as $invitado)
+                                        <div class="col" wire:key="invitado-{{ $invitado->id }}">
+                                            <div class="d-flex align-items-center justify-content-between p-2 rounded-3 border border-gray-200 bg-white hover-elevation-1 transition-all">
+                                                <div class="d-flex align-items-center gap-2 text-truncate">
+                                                    <div class="symbol symbol-30px symbol-circle bg-light-primary text-primary fw-bolder fs-8 d-flex align-items-center justify-content-center">
+                                                        {{ strtoupper(substr($invitado->name, 0, 2)) }}
+                                                    </div>
+                                                    <div class="d-flex flex-column text-truncate">
+                                                        <span class="fw-bold text-gray-800 fs-8 text-truncate">{{ $invitado->name }}</span>
+                                                        <span class="text-gray-500 fs-9 text-truncate">{{ $invitado->cargo ?? $invitado->email }}</span>
+                                                    </div>
+                                                </div>
+                                                @if(!$esLectura)
+                                                    <button type="button" class="btn btn-icon btn-xs btn-active-light-danger rounded-circle flex-shrink-0 ms-1" wire:click="toggleInvitado({{ $invitado->id }})" title="Quitar">
+                                                        <i class="ki-duotone ki-cross fs-7"><span class="path1"></span><span class="path2"></span></i>
+                                                    </button>
+                                                @endif
+                                            </div>
+                                        </div>
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-footer border-0 pt-0 pb-4 px-6 d-flex align-items-center justify-content-end gap-3">
+                    <button type="button" 
+                            class="btn btn-sm btn-light border-0 text-gray-700 fw-bold fs-7 px-5 h-40px rounded-3" 
+                            wire:click="cerrarModalInvitados">
+                        {{ $esLectura ? 'Cerrar' : 'Cancelar' }}
+                    </button>
+                    @if(!$esLectura)
+                        <button type="button" 
+                                class="btn btn-sm text-white fw-bold fs-7 px-6 h-40px rounded-3" 
+                                style="background-color: #0095FF;" 
+                                wire:click="cerrarModalInvitados">
+                            Confirmar Invitados
+                        </button>
+                    @endif
+                </div>
+            </div>
         </div>
     @endif
 </div>
 
 @push('styles')
     <style>
+        .animation-bounce-in {
+            animation: bounceInOverlay 0.25s ease-out forwards;
+        }
+
+        @keyframes bounceInOverlay {
+            from { opacity: 0; transform: scale(0.92); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
         .flatpickr-time-container {
             position: relative !important;
             overflow: visible !important;
@@ -360,7 +530,7 @@
 
         @keyframes metronicBounceIn {
             from { opacity: 0; transform: scale(0.9) translateY(12px); }
-            to { opacity: 1; transform: scale(1) translateY(0); }
+            to { opacity: 1; transform: scale(1); }
         }
 
         .flatpickr-calendar::before {

@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use app\services\AuditService;
 use Illuminate\Database\Eloquent\Relations\MorphMany;
+use App\Models\User;
 
 class Sesion extends Model
 {
@@ -25,11 +26,11 @@ class Sesion extends Model
         'hora_fin'    => 'datetime:H:i',
     ]; 
   
-    public function convocatoria() { return $this->belongsTo(Convocatoria::class); } 
+    //public function convocatoria() { return $this->belongsTo(Convocatoria::class); } 
     public function creador()      { return $this->belongsTo(User::class, "creada_por"); } 
     public function asistentes()   { return $this->hasMany(Asistente::class); } 
     public function notas()        { return $this->hasMany(Nota::class); } 
-    public function acuerdos()     { return $this->hasMany(Acuerdo::class); } 
+   // public function acuerdos()     { return $this->hasMany(Acuerdo::class); } 
   
     private const TRANSICIONES = [ 
         "convocada" => ["en_curso", "cancelada"], 
@@ -68,5 +69,21 @@ class Sesion extends Model
     public function documentos(): MorphMany
     {
         return $this->morphMany(Documento::class, 'documentable');
+    }
+
+    public function invitados()
+    {
+        return $this->belongsToMany(User::class, 'f1not_sesion_invitados', 'sesion_id', 'user_id')
+                    ->withTimestamps();
+    }
+    
+    public function convocatoria()
+    {
+        return $this->belongsTo(Convocatoria::class, 'convocatoria_id');
+    }
+
+    public function acuerdos()
+    {
+        return $this->hasMany(Acuerdo::class, 'sesion_id');
     }
 }

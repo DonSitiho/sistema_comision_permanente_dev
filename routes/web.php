@@ -73,6 +73,17 @@ Route::middleware(['auth', 'verified'])->group(function () {
         return view('pages.comunicados-consola');
     })->middleware(['auth'])->name('comunicados.consola');
     
+    //Acuerdos
+    Route::get('/crear-acuerdo/{sesionId?}', function ($sesionId = null) {
+        $sesion = $sesionId ? Sesion::find($sesionId) : null;
+        return view('pages.crearAcuerdo', compact('sesion'));
+    })->middleware(['auth'])->name('crearAcuerdo');
+
+    //Grupos
+    Route::get('/crear-grupoAct', function () {
+        return view('pages.crearGrupoAct');})
+        ->middleware(['auth'])->name('crear-grupo-act');
+
 });
 
 Route::get('/error', function () {
