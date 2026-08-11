@@ -95,7 +95,6 @@ class ComunicadoForm extends Component
 
     public function guardarBorrador(ComunicadoService $servicio): void
 {
-    /*
     try {
         $this->validate();
 
@@ -108,8 +107,7 @@ class ComunicadoForm extends Component
             'validacion' => $e instanceof \Illuminate\Validation\ValidationException ? $e->errors() : null,
         ]);
         throw $e;
-    }*/
-        $this->dispatch('console-log', message: 'Hola desde PHP');
+    }
 }
 
 public function enviar(ComunicadoService $servicio): void
