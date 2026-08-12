@@ -55,7 +55,6 @@ return [
     */
 
     'asset_url' => env('LIVEWIRE_ASSET_URL', null),
-    /*'asset_url' => '/comision_permanente/public',*/
     /*
     |--------------------------------------------------------------------------
     | Livewire App URL

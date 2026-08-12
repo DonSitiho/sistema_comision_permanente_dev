@@ -62,44 +62,40 @@ class ConvocatoriaModal extends Component
     }
 
     public function submit(): void 
-    { 
-        //Gate::authorize("create", Convocatoria::class); 
-        $this->validate();
-        try {
-            $convocatoria = Convocatoria::create([ 
-                "folio"        => FolioService::generarConvocatoria(), 
-                //"creada_por"   => Auth::id() ?? 1,
-                "creada_por"   => Auth::id(),
-                "tipo_conv"    => $this->tipo_conv,
-                "titulo"       => $this->titulo, 
-                "descripcion"  => $this->descripcion, 
-                "fecha_sesion" => $this->fecha_sesion, 
-                "lugar"        => $this->lugar, 
-                "estado"       => "borrador", 
-            ]);
+{ 
+    $this->validate();
 
-            $this->dispatch("convocatoria-creada", id: $convocatoria->id)->to('sesiones.sesion-modal');
-            $this->dispatch("refresh-listado-convocatorias");
+    try {
+        $convocatoria = Convocatoria::create([ 
+            "folio"        => FolioService::generarConvocatoria(), 
+            "creada_por"   => Auth::id(),
+            "tipo_conv"    => $this->tipo_conv,
+            "titulo"       => $this->titulo, 
+            "descripcion"  => $this->descripcion, 
+            "fecha_sesion" => date('Y-m-d H:i:s', strtotime($this->fecha_sesion)), 
+            "lugar"        => $this->lugar, 
+            "estado"       => "borrador", 
+        ]);
 
-            $this->dispatch('swal:alert', [
-                'icon'    => 'success',
-                'title'   => '¡Creado con éxito!',
-                'text'    => "La convocatoria <strong>{$convocatoria->folio}</strong><br><br>ha sido registrada correctamente en el sistema.",
-            ]);
-            $this->reset(['tipo_conv', 'titulo', 'descripcion', 'fecha_sesion', 'lugar']);
+        $this->dispatch("convocatoria-creada", id: $convocatoria->id)->to('sesiones.sesion-modal');
+        $this->dispatch("refresh-listado-convocatorias");
 
-        } catch (\Exception $e) {
-       
-            $this->dispatch('swal:alert', [
-                'icon'    => 'error',
-                'title'   => 'Hubo un problema',
-                'text'    => 'No se pudo guardar la convocatoria: ' . $e->getMessage(),
-            ]);
-        }
-       /* $this->dispatch("success", "Convocatoria {$convocatoria->folio} creada."); 
-        $this->dispatch("convocatoria-creada", id: $convocatoria->id); 
-        $this->reset(); */
-    } 
+        $this->dispatch('swal:alert', [
+            'icon'    => 'success',
+            'title'   => '¡Creado con éxito!',
+            'text'    => "La convocatoria <strong>{$convocatoria->folio}</strong><br>ha sido registrada correctamente.",
+        ]);
+
+        $this->reset(['tipo_conv', 'titulo', 'descripcion', 'fecha_sesion', 'lugar']);
+
+    } catch (\Exception $e) {
+        $this->dispatch('swal:alert', [
+            'icon'    => 'error',
+            'title'   => 'Hubo un problema',
+            'text'    => 'No se pudo guardar la convocatoria: ' . $e->getMessage(),
+        ]);
+    }
+} 
 
     public function posponerConvocatoria(bool $sinFecha = false): void
     {

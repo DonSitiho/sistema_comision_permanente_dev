@@ -28,7 +28,7 @@ Route::middleware(['auth', 'verified'])->group(function () {
     //Crear Convocatoria
     Route::get('/crear-convocatoria', function () {
         return view('pages.crearConvocatoria');})
-        ->middleware(['auth'])->name('crear-convocatoria'); 
+        ->middleware(['auth'])->name('crear-convocatoria');
         
     //Mis Convocatorias
     Route::get('/mis-convocatorias', function () {
