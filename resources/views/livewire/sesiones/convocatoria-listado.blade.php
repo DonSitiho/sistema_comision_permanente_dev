@@ -319,11 +319,12 @@
                             @else
                                 <button type="button" wire:click="ejecutarVerDatos({{ $convocatoriaSeleccionada->id }})" 
                                     class="btn btn-light-info py-4 w-100 fw-bold fs-5 text-start ps-8">
-                                    <i class="ki-duotone ki-eye fs-1 text-info me-3"><span class="path1"></span><span class="path2"></span></i>
+                                    <i class="las la-eye fs-1 text-info me-3"><span class="path1"></span><span class="path2"></span></i>
                                     Ver Datos de Sesión Registrada
                                 </button>
 
-                                @if($convocatoriaSeleccionada->creada_por === Auth::id())
+                                {{--@if($convocatoriaSeleccionada->creada_por === Auth::id() && $convocatoriaSeleccionada->estado === 'realizada')--}}
+                                @if($convocatoriaSeleccionada->creada_por === Auth::id() && $convocatoriaSeleccionada->estado === 'enviada' && ($convocatoriaSeleccionada->sesion && $convocatoriaSeleccionada->sesion->estado !== 'realizada' && $convocatoriaSeleccionada->sesion->estado !== 'en_curso'))
                                     <button type="button" wire:click="ejecutarPosponer({{ $convocatoriaSeleccionada->id }})" 
                                             class="btn btn-light-warning py-4 w-100 fw-bold fs-5 text-start ps-8">
                                         <i class="ki-duotone ki-time fs-1 text-warning me-3"><span class="path1"></span><span class="path2"></span></i>
@@ -344,8 +345,14 @@
                             @if($convocatoriaSeleccionada->creada_por === Auth::id() && $convocatoriaSeleccionada->sesion && $convocatoriaSeleccionada->sesion->estado === 'realizada')
                                 <a href="{{ route('documentos', $convocatoriaSeleccionada->sesion->id) }}" 
                                    class="btn btn-light-success py-4 w-100 fw-bold fs-5 text-start ps-8">
-                                    <i class="ki-duotone ki-cloud-upload fs-1 text-success me-3"><span class="path1"></span><span class="path2"></span></i>
+                                    <i class="lar la-file-alt fs-1 text-success me-3"><span class="path1"></span><span class="path2"></span></i>
                                     Subir Documento
+                                </a>
+
+                                <a href="{{ route('crearAcuerdo', $convocatoriaSeleccionada->sesion->id) }}" 
+                                   class="btn btn-light-primary py-4 w-100 fw-bold fs-5 text-start ps-8">
+                                    <i class="lar la-handshake fs-1 text-info me-3"><span class="path1"></span><span class="path2"></span></i>
+                                    Crear Acuerdos
                                 </a>
                             @endif
 
@@ -366,10 +373,10 @@
                             <p class="text-muted mt-3 fs-7 fw-semibold">Sincronizando información de la convocatoria...</p>
                         </div>
                     @endif
-                </div>
-                <div class="modal-footer bg-light">
+                </div><button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar Menú</button>
+                <!-- <div class="modal-footer bg-light">
                     <button type="button" class="btn btn-light" data-bs-dismiss="modal">Cerrar Menú</button>
-                </div>
+                </div>-->
             </div>
         </div>
     </div>

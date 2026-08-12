@@ -69,6 +69,26 @@
 						</a>
 						<!--end:Menu link-->
 					</div>
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link {{ request()->routeIs('crear-grupo-act') ? 'active' : '' }}" href="{{ route('crear-grupo-act') }}">
+							<span class="menu-bullet">
+								<span class="bullet bullet-dot"></span>
+							</span>
+							<span class="menu-title">Crear Grupo de Actividades</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
+					<div class="menu-item">
+						<!--begin:Menu link-->
+						<a class="menu-link {{ request()->routeIs('crear-convocatoria') ? 'active' : '' }}" href="{{ route('crear-convocatoria') }}">
+							<span class="menu-bullet">
+								<span class="bullet bullet-dot"></span>
+							</span>
+							<span class="menu-title">Mis Actividades</span>
+						</a>
+						<!--end:Menu link-->
+					</div>
 					<!--end:Menu item-->
 					
 					<!--begin:Menu item-->

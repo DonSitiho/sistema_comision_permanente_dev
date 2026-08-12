@@ -40,7 +40,9 @@ class ScpcSeeder extends Seeder
             // M1 — Acuerdos (Fase 1)
             'ver acuerdos', 'crear acuerdos', 'editar acuerdos', 'cerrar acuerdos',
             // M1 — Compromisos (Fase 1)
-            'ver compromisos', 'crear compromisos', 'editar compromisos',
+            //'ver compromisos', 'crear compromisos', 'editar compromisos',
+            // Actividades (Fase 2, se eliminan compromisos y se reemplazan por actividades)
+            'ver actividades', 'crear actividades', 'editar actividades',
             // M2 — Sesiones (Fase 1)
             'ver sesiones', 'crear sesiones', 'editar sesiones',
             // Auditoría
@@ -64,27 +66,31 @@ class ScpcSeeder extends Seeder
             'Secretario Técnico' => [
                 'ver usuarios', 'ver dependencias',
                 'ver acuerdos', 'crear acuerdos', 'editar acuerdos', 'cerrar acuerdos',
-                'ver compromisos', 'crear compromisos', 'editar compromisos',
+                'ver actividades', 'crear actividades', 'editar actividades',
+                // 'ver compromisos', 'crear compromisos', 'editar compromisos',
                 'ver sesiones', 'crear sesiones', 'editar sesiones',
             ],
  
             // OIC municipal: ve y gestiona dentro de su dependencia
             'Enlace / OIC' => [
-                'ver acuerdos',
-                'ver compromisos', 'crear compromisos', 'editar compromisos',
+                'ver acuerdos', 'crear acuerdos', 'editar acuerdos', 'cerrar acuerdos',
+                //'ver compromisos', 'crear compromisos', 'editar compromisos',
+                'ver actividades', 'crear actividades', 'editar actividades',
                 'ver sesiones',
             ],
  
             // Servidor público: solo sus tareas asignadas
             'Operativo' => [
                 'ver acuerdos',
-                'ver compromisos', 'editar compromisos',
+                //'ver compromisos', 'editar compromisos',
+                'ver actividades', 'editar actividades',
                 'ver sesiones',
             ],
  
             // Solo lectura para control y revisión
             'Auditor' => [
-                'ver acuerdos', 'ver compromisos', 'ver sesiones',
+                'ver acuerdos', /*'ver compromisos', */'ver sesiones',
+                'ver actividades',
                 'ver usuarios', 'ver dependencias', 'ver bitacora',
             ],
         ];
