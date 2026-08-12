@@ -30,7 +30,6 @@ class AppServiceProvider extends ServiceProvider
         // created / updated / deleted sin necesidad de llamarlo
         // manualmente en cada controlador.
         User::observe(UserObserver::class);
-<<<<<<< HEAD
         /*Livewire::setUpdateRoute(function ($handle) {
             return Route::post('public/livewire/update', $handle);
         });*/
@@ -39,16 +38,6 @@ class AppServiceProvider extends ServiceProvider
         /*Livewire::setScriptRoute(function ($handle) {
             return Route::get('public/livewire/livewire.js', $handle);
         });*/
-=======
-        Livewire::setUpdateRoute(function ($handle) {
-            return Route::post('/comision_permanente/public/livewire/update', $handle);
-        });
-
-        // 2. Ruta para el Javascript nativo
-        Livewire::setScriptRoute(function ($handle) {
-            return Route::get('/comision_permanente/public/livewire/livewire.js', $handle);
-        });
->>>>>>> 98b0ecd1280c163b8b7209d4402c2591a7cea6bc
 
     }
 }

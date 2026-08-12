@@ -21,8 +21,7 @@
             <table class="table table-row-dashed table-row-gray-300 align-middle gy-3">
                 <thead>
                     <tr class="fw-bold text-muted text-uppercase fs-8">
-                        <th>Titulo</th><th>Categoria</th><th>Fecha</th><th>Estado</th><th>Destinatarios</th><th>Lectura</th>
-                    </tr>
+                        <th>Titulo</th><th>Categoria</th><th>Fecha</th><th>Estado</th><th>Destinatarios</th><th>Lectura</th><th>Acciones</th>
                 </thead>
                 <tbody>
                     @forelse ($comunicados as $comunicado)
@@ -40,9 +39,18 @@
                                 </span>
                             </td>
                             <td>{{ $comunicado->destinatarios()->count() }}</td>
-                            <td>
+                           <td>
                                 @if ($comunicado->estado === 'enviado')
                                     <span class="fs-8 text-muted">{{ $comunicado->porcentajeLectura() }}%</span>
+                                @else
+                                    <span class="text-muted fs-8">--</span>
+                                @endif
+                            </td>
+                            <td>
+                                @if ($comunicado->estado === 'borrador')
+                                    <a href="{{ route('comunicados.editar', $comunicado->id) }}"
+                                       onclick="event.stopPropagation()"
+                                       class="btn btn-sm btn-light-primary">Editar</a>
                                 @else
                                     <span class="text-muted fs-8">--</span>
                                 @endif
